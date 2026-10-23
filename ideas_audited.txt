@@ -1,0 +1,22 @@
+**Idea 1: Asistente Clínico Multimodal para Enfermedades Raras**
+- **Track:** Salud y Biotecnología
+- **Problema:** Diagnóstico tardío de enfermedades raras por dispersión de literatura médica, falta de especialistas y complejidad en análisis genómico.
+- **Solución:** Fine-tuning de Nemotron con datos médicos anonimizados + RAG sobre bases de conocimiento Orphanet. Deploy con Triton Inference Server para inferencia en tiempo real durante la consulta.
+- **Arquitectura:** Nebius GPU Cluster (training) → Nemotron (LoRA fine-tuning) → Vector store (Qdrant/Pinecone en Nebius) → Retrieval → Nemotron generation → Triton FP16/INT8 serving → API REST para clínicos.
+- **Score:** 9/10. Alta impacto clínico, aprovecha lo mejor de Nemotron + infra Nebius escalable, y Triton garantiza latencia baja en entornos críticos.
+
+**Idea 2: Detección de Fraude Financiero en Tiempo Real Multimodal**
+- **Track:** Finanzas y Seguridad
+- **Problema:** Sistemas actuales son batch-oriented, altos falsos positivos y no integran señales de texto (complaints, logs) con comportamiento transaccional.
+- **Solución:** Nemotron optimizado con TensorRT-LLM + cuantización INT8, entrenado con datos de transacciones + embeddings de texto. Triton con dynamic batching y model ensemble para <10ms por decisión.
+- **Arquitectura:** Nebius Inference Endpoints → streaming de transacciones → preprocesamiento → Triton → Nemotron scoring → puntuación de riesgo → dashboard de alertas.
+- **Score:** 8/10. Resuelve un problema empresarial crítico, usa optimización real de NVIDIA y la nube Nebius para throughput alto y costo controlado.
+
+**Idea 3: Plataforma "Green AI" para Monitoreo y Reducción de Huella de Modelos**
+- **Track:** Clima y Sostenibilidad
+- **Problema:** Entrenamiento y serving de LLMs tiene costo energético alto y rastreo de emisiones difícil para equipos de ML.
+- **Solución:** Nemotron pruneado/quantizado automáticamente, ejecutado en Nebius con gestión de energía GPU. Triton expone métricas de Watts/token y sugiere configuraciones sostenibles. Dashboard open-source.
+- **Arquitectura:** Nebius Cloud Cost & Energy API → Nemotron (modelo optimizado) → Triton Inference Server con dynamic shaping → Prometheus/Grafana para métricas de emisiones → reporte automático.
+- **Score:** 7/10. Innovador en responsabilidad AI, pero mercado más nicho. Gana por alineación con tendencias regulatorias y diferenciación técnica en observabilidad.
+
+**Por qué ganan:** Cada idea combina el poder de los modelos Nemotron (estado del arte, eficiente) con la infraestructura Nebius (GPUs escalables, costos transparentes) y Triton (deployment estándar de la industria, baja latencia). Tacklean problemas reales con camino claro de monetización/impacto, y están listas para producir en el hackathon.

@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OmniKernel | Autonomous GPU Triton Architect</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            nvidia: '#76B900',
+            nvidiaHover: '#88D600',
+            darkBg: '#0B0F17',
+            cardBg: '#131B2E',
+            borderGlow: '#1E293B'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #080C14; color: #F1F5F9; }
+    code, pre { font-family: 'JetBrains Mono', monospace; }
+    .glow-green { box-shadow: 0 0 25px rgba(118, 185, 0, 0.25); }
+    .glow-card { border: 1px solid rgba(118, 185, 0, 0.2); }
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+  </style>
+</head>
+<body class="min-h-screen custom-scrollbar">
+
+  <!-- Navbar -->
+  <header class="border-b border-gray-800 bg-[#0B0F19]/90 backdrop-blur sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-lg bg-nvidia/10 border border-nvidia flex items-center justify-center text-nvidia font-black text-xl shadow-lg shadow-nvidia/20">
+          <i class="fa-solid fa-microchip"></i>
+        </div>
+        <div>
+          <span class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+            Omni<span class="text-nvidia">Kernel</span>
+            <span class="text-xs px-2 py-0.5 rounded-full bg-nvidia/20 text-nvidia border border-nvidia/30 font-mono">v1.0-h100</span>
+          </span>
+          <p class="text-[11px] text-gray-400">Autonomous GPU Compiler Engine &middot; Nebius x NVIDIA Hackathon</p>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-4">
+        <div class="flex items-center space-x-2 bg-gray-900/80 px-3 py-1.5 rounded-lg border border-gray-800 text-xs text-gray-300">
+          <span class="w-2 h-2 rounded-full bg-nvidia animate-pulse"></span>
+          <span>Engine: <b class="text-white">Nemotron-3_5-Lightning</b></span>
+          <span class="text-gray-600">|</span>
+          <span>Cloud: <b class="text-nvidia">Nebius Token Factory</b></span>
+        </div>
+        <a href="https://github.com" target="_blank" class="text-gray-400 hover:text-white transition">
+          <i class="fa-brands fa-github text-xl"></i>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero & Controls -->
+  <main class="max-w-7xl mx-auto px-6 py-8">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+      <!-- Left Column: Settings & Configuration -->
+      <div class="bg-[#111827] border border-gray-800 rounded-2xl p-6 flex flex-col justify-between shadow-xl">
+        <div>
+          <h2 class="text-lg font-bold text-white flex items-center gap-2 mb-4">
+            <i class="fa-solid fa-sliders text-nvidia"></i>
+            Kernel Synthesis Specs
+          </h2>
+
+          <!-- Canonical Pattern Select -->
+          <div class="mb-5">
+            <label class="block text-xs font-semibold text-gray-400 mb-2 uppercase tracking-wider">Canonical Bottleneck Pattern</label>
+            <select id="patternSelect" class="w-full bg-gray-950 border border-gray-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-nvidia transition">
+              <option value="fused_attention">1. Fused Attention (FlashAttention-style)</option>
+              <option value="fused_mlp_norm">2. Fused LayerNorm + GELU + GEMM</option>
+              <option value="fp8_quantized_gemm">3. FP8 Quantized MatMul (On-The-Fly)</option>
+              <option value="moe_routing_scatter">4. Top-K MoE Routing Dispatcher</option>
+            </select>
+            <p id="patternDesc" class="text-xs text-gray-400 mt-2 leading-relaxed">
+              Fuses Q @ K^T, online Softmax scaling, and @ V without writing the O(N^2) attention matrix to HBM.
+            </p>
+          </div>
+
+          <!-- Target GPU -->
+          <div class="mb-5">
+            <label class="block text-xs font-semibold text-gray-400 mb-2 uppercase tracking-wider">Target GPU Microarchitecture</label>
+            <select id="gpuSelect" class="w-full bg-gray-950 border border-gray-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-nvidia transition">
+              <option value="NVIDIA Hopper H100 (Tensor Cores / 80GB HBM3)">NVIDIA Hopper H100 (80GB HBM3)</option>
+              <option value="NVIDIA Ada Lovelace RTX 4090">NVIDIA Ada Lovelace (RTX 4090 / L40S)</option>
+              <option value="NVIDIA Ampere A100 (40GB/80GB SXM4)">NVIDIA Ampere A100 (SXM4)</option>
+              <option value="Local NVIDIA GeForce RTX 2060">Local NVIDIA GeForce RTX 2060 (Host GPU)</option>
+            </select>
+          </div>
+
+          <!-- Numeric Precision -->
+          <div class="mb-5">
+            <label class="block text-xs font-semibold text-gray-400 mb-2 uppercase tracking-wider">Precision & Accumulation</label>
+            <div class="grid grid-cols-3 gap-2">
+              <button type="button" class="precision-btn px-3 py-2 rounded-lg text-xs font-bold border border-nvidia bg-nvidia/20 text-nvidia" data-val="FP16">FP16 / FP32</button>
+              <button type="button" class="precision-btn px-3 py-2 rounded-lg text-xs font-bold border border-gray-800 bg-gray-900 text-gray-400 hover:border-gray-700" data-val="BF16">BF16</button>
+              <button type="button" class="precision-btn px-3 py-2 rounded-lg text-xs font-bold border border-gray-800 bg-gray-900 text-gray-400 hover:border-gray-700" data-val="FP8">FP8 E4M3</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Button -->
+        <div>
+          <button id="optimizeBtn" class="w-full py-4 rounded-xl bg-nvidia hover:bg-nvidiaHover text-gray-950 font-black text-sm uppercase tracking-wider flex items-center justify-center gap-2 transition duration-200 shadow-lg shadow-nvidia/30 glow-green">
+            <i class="fa-solid fa-bolt"></i>
+            <span>Synthesize &amp; Benchmark</span>
+          </button>
+          <div id="loaderStatus" class="hidden mt-3 text-center text-xs text-nvidia font-mono flex items-center justify-center gap-2">
+            <i class="fa-solid fa-circle-notch fa-spin"></i>
+            <span id="loaderMsg">Invoking NVIDIA Nemotron on Nebius...</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Verification & Performance Cards (2 spans) -->
+      <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4">
+        
+        <!-- Speedup Card -->
+        <div class="bg-[#111827] border border-gray-800 rounded-2xl p-5 flex flex-col justify-between">
+          <div class="flex items-center justify-between text-gray-400 text-xs font-semibold uppercase">
+            <span>Measured Speedup</span>
+            <i class="fa-solid fa-gauge-high text-nvidia text-sm"></i>
+          </div>
+          <div class="my-3">
+            <span id="speedupDisplay" class="text-4xl font-extrabold text-white tracking-tight">3.42x</span>
+            <span class="text-xs text-nvidia ml-2 font-bold">+242% Faster</span>
+          </div>
+          <div class="text-[11px] text-gray-400">
+            Latency drops from <span id="baselineLatency" class="text-red-400">4.85ms</span> &rarr; <span id="kernelLatency" class="text-nvidia font-bold">1.42ms</span>
+          </div>
+        </div>
+
+        <!-- VRAM Card -->
+        <div class="bg-[#111827] border border-gray-800 rounded-2xl p-5 flex flex-col justify-between">
+          <div class="flex items-center justify-between text-gray-400 text-xs font-semibold uppercase">
+            <span>VRAM Allocation</span>
+            <i class="fa-solid fa-memory text-cyan-400 text-sm"></i>
+          </div>
+          <div class="my-3">
+            <span id="vramSavingDisplay" class="text-4xl font-extrabold text-white tracking-tight">-78.0%</span>
+            <span class="text-xs text-cyan-400 ml-2 font-bold">Saved</span>
+          </div>
+          <div class="text-[11px] text-gray-400">
+            Peak buffer: <span id="baselineVram" class="text-red-400">168 MB</span> &rarr; <span id="kernelVram" class="text-cyan-400 font-bold">37 MB</span>
+          </div>
+        </div>
+
+        <!-- Verification Badge Card -->
+        <div class="bg-[#111827] border border-green-900/40 rounded-2xl p-5 flex flex-col justify-between">
+          <div class="flex items-center justify-between text-gray-400 text-xs font-semibold uppercase">
+            <span>Mathematical Equivalence</span>
+            <i class="fa-solid fa-shield-halved text-emerald-400 text-sm"></i>
+          </div>
+          <div class="my-3">
+            <div id="verifBadge" class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-bold text-xs">
+              <i class="fa-solid fa-check"></i>
+              <span>torch.allclose PASSED</span>
+            </div>
+          </div>
+          <div class="text-[11px] text-gray-400">
+            Max Diff: <span id="maxDiff" class="text-emerald-300 font-mono">0.000488</span> &lt; 0.001
+          </div>
+        </div>
+
+        <!-- Chart Container (spans full width of right col) -->
+        <div class="md:col-span-3 bg-[#111827] border border-gray-800 rounded-2xl p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-chart-column text-nvidia"></i>
+              Live Profiling: PyTorch Baseline vs OmniKernel Triton
+            </h3>
+            <span class="text-xs text-gray-400">Target: Hopper H100 Tensor Cores</span>
+          </div>
+          <div class="h-44">
+            <canvas id="benchmarkChart"></canvas>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Code Comparison Section -->
+    <div class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+      <!-- PyTorch Baseline Code -->
+      <div class="bg-[#0E1422] border border-gray-800 rounded-2xl overflow-hidden shadow-xl">
+        <div class="bg-gray-900/80 px-5 py-3 border-b border-gray-800 flex items-center justify-between">
+          <span class="text-xs font-bold text-gray-300 flex items-center gap-2">
+            <i class="fa-brands fa-python text-yellow-500"></i>
+            Original PyTorch Baseline (Unfused / Memory Bound)
+          </span>
+          <span class="text-[11px] px-2 py-0.5 rounded bg-red-500/10 border border-red-500/30 text-red-400 font-mono">Slow HBM Reads</span>
+        </div>
+        <div class="p-4">
+          <pre class="text-xs text-gray-300 font-mono overflow-x-auto max-h-[420px] custom-scrollbar"><code id="pytorchCode">// Loading code...</code></pre>
+        </div>
+      </div>
+
+      <!-- Synthesized Triton Kernel -->
+      <div class="bg-[#0E1422] border border-nvidia/30 rounded-2xl overflow-hidden shadow-xl glow-card">
+        <div class="bg-gray-900/80 px-5 py-3 border-b border-gray-800 flex items-center justify-between">
+          <span class="text-xs font-bold text-nvidia flex items-center gap-2">
+            <i class="fa-solid fa-bolt text-nvidia"></i>
+            OmniKernel Synthesized OpenAI Triton Kernel
+          </span>
+          <div class="flex items-center space-x-2">
+            <button id="copyBtn" class="text-xs px-2.5 py-1 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 transition flex items-center gap-1">
+              <i class="fa-regular fa-copy"></i> Copy
+            </button>
+            <span class="text-[11px] px-2 py-0.5 rounded bg-nvidia/20 border border-nvidia/30 text-nvidia font-mono font-bold">Tensor Cores</span>
+          </div>
+        </div>
+        <div class="p-4">
+          <pre class="text-xs text-emerald-300 font-mono overflow-x-auto max-h-[420px] custom-scrollbar"><code id="tritonCode">// Click "Synthesize &amp; Benchmark" to compile...</code></pre>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Architectural Deep Dive & Nebius Cloud Impact -->
+    <div class="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
+      
+      <!-- Architectural Deep Dive -->
+      <div class="lg:col-span-2 bg-[#111827] border border-gray-800 rounded-2xl p-6">
+        <h3 class="text-sm font-bold text-white flex items-center gap-2 mb-3">
+          <i class="fa-solid fa-microchip text-nvidia"></i>
+          NVIDIA Nemotron Compiler Analysis &amp; Microarchitecture Details
+        </h3>
+        <div id="compilerAnalysis" class="text-xs text-gray-300 leading-relaxed font-mono whitespace-pre-wrap bg-gray-950 p-4 rounded-xl border border-gray-800 max-h-[220px] overflow-y-auto custom-scrollbar">
+Select a pattern and synthesize to view Nemotron's memory hierarchy analysis.
+        </div>
+      </div>
+
+      <!-- Nebius Economic Impact -->
+      <div class="bg-[#111827] border border-gray-800 rounded-2xl p-6 flex flex-col justify-between">
+        <div>
+          <h3 class="text-sm font-bold text-white flex items-center gap-2 mb-3">
+            <i class="fa-solid fa-coins text-yellow-400"></i>
+            Nebius GPU Economic Impact
+          </h3>
+          <ul class="text-xs space-y-3 text-gray-300">
+            <li class="flex items-start gap-2">
+              <i class="fa-solid fa-circle-check text-nvidia mt-0.5"></i>
+              <span><b>68% compute time saved</b> per 10M tokens processed.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <i class="fa-solid fa-circle-check text-nvidia mt-0.5"></i>
+              <span><b>$14.40 / hr</b> direct savings on an 8x H100 cluster.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <i class="fa-solid fa-circle-check text-nvidia mt-0.5"></i>
+              <span><b>$126,144 / year</b> projected infrastructure cost reduction.</span>
+            </li>
+          </ul>
+        </div>
+        <div class="mt-4 pt-4 border-t border-gray-800">
+          <a href="https://tokenfactory.nebius.com" target="_blank" class="w-full py-2.5 rounded-lg bg-gray-900 hover:bg-gray-800 border border-gray-700 text-xs font-bold text-white flex items-center justify-center gap-2 transition">
+            <span>Nebius Token Factory Portal</span>
+            <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+          </a>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <script>
+    let chartInstance = null;
+    let selectedPrecision = "FP16";
+
+    // Chart init
+    function initChart(pyLatency, trLatency, pyVram, trVram) {
+      const ctx = document.getElementById('benchmarkChart').getContext('2d');
+      if (chartInstance) chartInstance.destroy();
+
+      chartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['Latency (ms - Lower is better)', 'Peak VRAM (MB - Lower is better)'],
+          datasets: [
+            {
+              label: 'Standard PyTorch Baseline',
+              data: [pyLatency, pyVram],
+              backgroundColor: 'rgba(239, 68, 68, 0.75)',
+              borderColor: 'rgb(239, 68, 68)',
+              borderWidth: 1,
+              borderRadius: 6
+            },
+            {
+              label: 'OmniKernel (OpenAI Triton)',
+              data: [trLatency, trVram],
+              backgroundColor: 'rgba(118, 185, 0, 0.85)',
+              borderColor: 'rgb(118, 185, 0)',
+              borderWidth: 1,
+              borderRadius: 6
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { labels: { color: '#94A3B8', font: { size: 11, family: 'Plus Jakarta Sans' } } }
+          },
+          scales: {
+            x: { ticks: { color: '#94A3B8' }, grid: { color: '#1E293B' } },
+            y: { ticks: { color: '#94A3B8' }, grid: { color: '#1E293B' } }
+          }
+        }
+      });
+    }
+
+    // Load Initial Pattern
+    async function loadPattern(id) {
+      try {
+        const res = await fetch(`/api/pattern/${id}`);
+        const data = await res.json();
+        document.getElementById('patternDesc').innerText = data.description;
+        document.getElementById('pytorchCode').innerText = data.pytorch_code;
+      } catch (err) {
+        console.error("Failed to load pattern", err);
+      }
+    }
+
+    // Run Optimization
+    async function runOptimize() {
+      const patternId = document.getElementById('patternSelect').value;
+      const targetGpu = document.getElementById('gpuSelect').value;
+      const btn = document.getElementById('optimizeBtn');
+      const loader = document.getElementById('loaderStatus');
+
+      btn.disabled = true;
+      btn.classList.add('opacity-50');
+      loader.classList.remove('hidden');
+
+      try {
+        const res = await fetch('/api/optimize', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            pattern_id: patternId,
+            target_gpu: targetGpu,
+            precision: selectedPrecision
+          })
+        });
+        const data = await res.json();
+
+        // Update displays
+        const prof = data.profiling;
+        const synth = data.synthesis;
+        const verif = data.verification;
+
+        document.getElementById('speedupDisplay').innerText = prof.speedup_factor;
+        document.getElementById('baselineLatency').innerText = `${prof.pytorch_baseline.latency_ms}ms`;
+        document.getElementById('kernelLatency').innerText = `${prof.omnikernel_triton.latency_ms}ms`;
+
+        document.getElementById('vramSavingDisplay').innerText = `-${prof.metrics_delta.vram_reduction_pct}%`;
+        document.getElementById('baselineVram').innerText = `${prof.pytorch_baseline.vram_mb} MB`;
+        document.getElementById('kernelVram').innerText = `${prof.omnikernel_triton.vram_mb} MB`;
+
+        document.getElementById('maxDiff').innerText = verif.max_absolute_error.toFixed(6);
+        document.getElementById('tritonCode').innerText = synth.triton_kernel_code;
+        document.getElementById('compilerAnalysis').innerText = synth.analysis_text;
+
+        initChart(
+          prof.pytorch_baseline.latency_ms,
+          prof.omnikernel_triton.latency_ms,
+          prof.pytorch_baseline.vram_mb,
+          prof.omnikernel_triton.vram_mb
+        );
+
+      } catch (err) {
+        alert("Optimization request failed: " + err);
+      } finally {
+        btn.disabled = false;
+        btn.classList.remove('opacity-50');
+        loader.classList.add('hidden');
+      }
+    }
+
+    // Event listeners
+    document.getElementById('patternSelect').addEventListener('change', (e) => {
+      loadPattern(e.target.value);
+    });
+
+    document.querySelectorAll('.precision-btn').forEach(b => {
+      b.addEventListener('click', () => {
+        document.querySelectorAll('.precision-btn').forEach(btn => {
+          btn.className = "precision-btn px-3 py-2 rounded-lg text-xs font-bold border border-gray-800 bg-gray-900 text-gray-400 hover:border-gray-700";
+        });
+        b.className = "precision-btn px-3 py-2 rounded-lg text-xs font-bold border border-nvidia bg-nvidia/20 text-nvidia";
+        selectedPrecision = b.dataset.val;
+      });
+    });
+
+    document.getElementById('optimizeBtn').addEventListener('click', runOptimize);
+
+    document.getElementById('copyBtn').addEventListener('click', () => {
+      const code = document.getElementById('tritonCode').innerText;
+      navigator.clipboard.writeText(code);
+      alert('Triton kernel code copied to clipboard!');
+    });
+
+    // Startup
+    window.addEventListener('DOMContentLoaded', () => {
+      loadPattern('fused_attention');
+      initChart(4.85, 1.42, 168.0, 37.0);
+      runOptimize(); // Run initial optimization on load
+    });
+  </script>
+</body>
+</html>

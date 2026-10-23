@@ -1,0 +1,81 @@
+Here's a thinking process:
+
+1.  **Analyze User Input:**
+   - **Project:** 'OmniKernel' (Nebius x NVIDIA Hackathon)
+   - **Goal:** Design the perfect demo to "wow" judges in 2 minutes (video/presentation)
+   - **Specific Request:** Step-by-step design, exact 2-minute script, what to show on screen each second
+   - **Persona:** Senior Principal AI Systems & GPU Compiler Architect at NVIDIA, hackathon judge
+   - **Language:** Spanish
+   - **Constraints:** Concise, direct, step-by-step, exact script/timing, screen content per second
+
+2.  **Identify Key Requirements:**
+   - 2 minutes = 120 seconds
+   - Must be structured, punchy, judge-focused
+   - Need to highlight "OmniKernel" strengths in context of AI systems/GPU compilation/Nebius
+   - Must fit the persona: senior architect, judge perspective
+   - Output in Spanish
+   - Exact script + screen content per second
+
+3.  **Determine Strategy:**
+   - Structure: Problem → Solution → Magic → Impact (in 120s)
+   - Break down into 12-second chunks or 10-second segments for easier timing
+   - Write a tight script with specific visual cues
+   - Ensure each second counts, no fluff
+   - Judge perspective: performance, innovation, clarity, "wow" factor
+   - Leverage Nebius (cloud/GPU) + NVIDIA (compilation/kernel) + OmniKernel (likely a unified/optimized kernel/abstraction layer)
+
+   Let's draft a 120-second breakdown. I'll aim for ~2-second per slide/scene, or precise 1-second markers. Since it's a video/presentation, I'll map screen content to seconds 1-120.
+
+   Key elements judges love:
+   - Clear problem statement (first 10s)
+   - Unique value prop (10-30s)
+   - Technical depth + simplicity balance (30-60s)
+   - Live/demo magic (60-90s)
+   - Impact/future (90-120s)
+
+   I'll create a second-by-second script. Since doing 120 individual lines might be excessive but the user asked for "qué mostrar en pantalla en cada segundo", I'll provide a condensed but precise breakdown, maybe per 5-10 second blocks with clear "en segundo X: mostrar Y", or I'll do a true 1-second map if feasible in a readable format. Given token limits, I'll structure it as a timeline with key moments, but I'll try to honor the "each second" request by grouping or specifying critical seconds. Actually, I can provide a precise script with second markers for the most impactful moments, or a dense timeline. Let's do a structured 120s breakdown in a compact format.
+
+   Let's think like a senior architect/judge:
+   - Judges see many demos. First 5s decide attention.
+   - Need to show: problem, kernel innovation, Nebius integration, performance gain, "wow" moment.
+   - Keep it under 2 min.
+
+   I'll create a script with on-screen text/visuals per 10-second segment, and note key seconds. Or I'll output a table-like structure: Segundo 1-2: ..., Segundo 3-4: ..., etc. To truly satisfy "cada segundo", I'll try to give a 1-second granularity but in a concise list. Given practical limits, I'll provide a highly structured timeline with per-second cues, maybe in a code block or table format.
+
+   Let's draft the content first, then format.
+
+   Script concept:
+   0-5s: Hook - "Tu IA es solo tan buena como su kernel"
+   5-15s: Problem - fragmentation, overhead, slow iteration
+   15-25s: Solution - OmniKernel unified abstraction layer
+   25-35s: Tech magic - compile-time optimization, zero-cost abstraction, Nebius GPU scaling
+   35-45s: Live-coded benchmark: 3x speedup, same code
+   45-55s: Visual: graphs, before/after, Nebius cloud deployment
+   55-65s: Judge-relevant hook: "No más trade-offs"
+   65-75s: Demo: one-line change, automatic parallelization on Nebius GPUs
+   75-85s: Deep dive: compiler integration, GPU ISA awareness
+   85-95s: Real-world workload: LLM inference/training snippet
+   95-105s: Impact: cost, time, energy reduction
+   105-115s: "Prueba ahora" / open source / Nebius link
+   115-120s: Thank you / question prompt
+
+   Now, map to exact seconds. I'll create a concise 1-second timeline, but to keep it readable and practical, I'll do 5-second blocks with key second markers, or a true 1-second list. Given the prompt asks "qué mostrar en pantalla en cada segundo", I'll attempt a 1-second granularity in a structured format, maybe using a markdown table or list. I'll prioritize clarity and impact.
+
+   Let's draft the actual output in Spanish, persona included, concise, direct.
+
+   Structure:
+   - Brief intro/philosophy (why this works)
+   - The 120-second script/timeline
+   - Per-second screen content summary (I'll compress to key seconds or provide a dense timeline)
+
+   Actually, I can give a precise per-second script by using a compact format. Let me try a 1-second timeline in a code block, but 120 lines might be too much. I'll provide a 10-second granularity with explicit "en el segundo X" notes, and highlight the critical moments judges look at. Or I'll just do it second-by-second in a list, keeping each line very short.
+
+   Given the persona and hackathon context, judges value: clarity, novelty, technical credibility, visual impact, brevity. I'll craft it accordingly.
+
+   Let's produce the Spanish response. I'll structure it as a tight 2-minute narrative with second-by-second screen cues, condensed but precise. I'll use a timeline format.
+
+   Draft:
+   [PERSONA SETUP] Soy Arquitecto Principal de Sistemas AI y Compiladores NVIDIA, juez del hackathon.
+   El truco: cada segundo debe contar una historia, mostrar tecnología real y generar "wow" inmediato.
+
+   I'll then provide the timeline. Let's do true per-second in a markdown list, ~120 entries, but I'll summarize patterns and give exact cues for key seconds, plus a full timeline in an efficient format. Actually, I'll fulfill literally: provide what to show each second

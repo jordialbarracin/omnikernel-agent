@@ -1,0 +1,52 @@
+### AUDITORÍA TÉCNICA DE OMNIKERNEL
+**Juez:** Arquitecto Principal de Sistemas AI & Compiladores GPU, NVIDIA  
+**Contexto:** Nebius x NVIDIA Global AI Hackathon – Track "Coding & Agentic Engineering"  
+**Sistema evaluado:** Agente autónomo Nemotron sobre Nebius Token Factory → síntesis de kernels Triton + verificación + benchmark en tiempo real.
+
+---
+
+### 1. ¿Qué es exactamente un Kernel GPU? (Explicación rigurosa pero accesible)
+
+En términos sencillos pero técnicos: **un kernel GPU es una función pequeña y altamente optimizada que se ejecuta directamente sobre los núcleos de la GPU, en lugar de que la CPU gestione la computación paso a paso.**
+
+*   **En la CPU:** El procesador secuencia instrucciones, gestiona memoria, ramifica lógica. Es versátil pero lento para tareas masivas.
+*   **En la GPU:** Miles de núcleos (CUDA cores, Tensor Cores) trabajan en paralelo. Un kernel es el código que le dice a esos núcleos: *"haced esta operación matemática específica en estos datos, en este patrón de memoria, aprovechando la jerarquía de caché SRAM/shared memory y las unidades de Tensor Cores para multiplicaciones mixtas FP16/BF18/FP8"*.
+*   **Valor crítico:** El verdadero cuello de botella en IA no es la capacidad de cálculo bruta, sino **el movimiento de datos** (HBM ➜ SRAM ➜ registers). Un kernel bien diseñado:
+    *   **Coalesce acceso a HBM** (conjuntos contiguos de threads leen/writes unidos → ancho de banda máximo).
+    *   **Reusa registros y caché SRAM** (evita recargas repetidas de pesos/activaciones).
+    *   **Activa Tensor Cores** (para FP16/BF16/FP8 con acumulación en FP32, dando 2x-4x de throughput vs cálculo puro).
+*   **Ejemplo:** En lugar de que PyTorch llame a una función CPU genérica para "LayerNorm + GELU + Linear", un kernel fusionado hace todo en un solo pasada de memoria, eliminando reads/writes intermedios en HBM. Eso es lo que logra un speedup de 2x-4x.
+
+---
+
+### 2. Puntuación global: **8 / 10** (con matices de ejecución)
+
+**¿Por qué un 8 y no un 10?**
+*   **Fortalezas conceptuales y de alineación con la pila NVIDIA:** El sistema aprovecha correctamente Triton (el lenguaje de kernels oficial de NVIDIA), Nemotron (modelo de código/optimización), y apunta a la jerarquía HBM/SRAM real. El flujo PyTorch → AST → Triton → verificación → benchmark es **técnicamente viable y muy bien alineado** con la visión de NVIDIA sobre compiladores asistidos por IA.
+*   **Puntuación de prototipo este fin de semana:** Un 8/10 **si el scope está bien definido**. Un 7/10 si se intenta hacer "todo" (cualquier operador PyTorch arbitrario). El jurado de NVIDIA valora la **realización concreta** sobre la ambición teórica. Si en dos minutos muestras un kernel real generado, compilado y corriendo con medición de speedup, es un éxito contundente.
+
+**Por qué no un 9-10:** Los compiladores automáticos de verdad (como los de NVIDIA Research o los basados en MLIR) llevan años y requieren optimizaciones de flujo, selección de patrones y validación de precisión que un hackathon weekend no puede cubrir completamente. El riesgo está en la "últina milla" de integración AST→Triton→verificación numérica.
+
+---
+
+### 3. Mayores fortalezas competitivas en el track "Coding & Agentic Engineering"
+
+| Fortaleza | Por qué importa al jurado NVIDIA/Nebius |
+|-----------|------------------------------------------|
+| **Síntesis de kernels dirigida por LLM** | Nemotron analizando el AST de PyTorch y generando Triton válido es un caso de uso "killer" de IA generativa en infraestructura. Demuestra que el LLM no solo escribe código, sino que optimiza para hardware específico. |
+| **Conciencia de la jerarquía de memoria** | Al mencionar explícitamente coalescencia HBM, reuso de registros y SRAM/shared memory, shows que el agente entiende el modelo de ejecución de GPU, no solo la lógica algorítmica. |
+| **Verificación matemática integrada** | `torch.allclose` en FP16/BF16/FP8 + detección de race conditions muestra ingeniería de sistemas rigurosa. Los jueces temen que los kernels generados por IA den resultados incorrectos; tu sistema aborda eso de frente. |
+| **Benchmark interactivo en tiempo real** | Transformar métricas técnicas (TFLOPS, speedup, VRAM savings) en un UI interactivo es lo que diferencia un "proof of concept" de una demo convincente para inversores/jurados. |
+| **Integración Nebius Token Factory** | Añade un componente económico/deployment: el agente no solo optimiza, también "factura" el uso de recursos optimizados. Es un diferenciador de producto completo, no solo una herramienta de investigación. |
+
+---
+
+### 4. Riesgos técnicos reales y mitigaciones para que funcione impecable este fin de semana
+
+| Riesgo | Gravedad | Mitigación práctica (weekend mode) |
+|--------|----------|------------------------------------|
+| **Cobertura AST de PyTorch demasiado amplia** | Alto | **Scope a 3-4 patrones canonicales:** `nn.MultiheadAttention`, `LayerNorm+Linear`, `GELU`, y `MoE routing`. No intentes parsear todo el código arbitrario. Usa `torch.fx.symbolic_trace` con módulos conocidos. |
+| **Generación de Triton con errores de precisión o forma de tensor** | Alto | **Usa plantillas (templates) de Triton existentes** + prompts a Nemotron que incluyan "shape constraints" y "dtype rules". Valida cada kernel generado con `torch.compile(mode="max-autotune")` como referencia antes de correr el tuyo. |
+| **Numerical equivalence FP8/BF16/FP16** | Medio-Alto | **Verificación por muestreo:** No checks formales exhaustivos (imposible en weekend). Haz `torch.allclose(optimized_output, reference_output, rtol=1e-2, atol=1e-3)` en 1000 inputs aleatorios. Si pasa, muestra el reporte de error máximo. |
+| **Race conditions en kernels Triton** | Medio | **Triton abstrae mucho el threading.** Aún así, en el demo usa `__syncthreads()` donde sea necesario y limita a kernels "reduction" o "fusion" donde las race conditions son imposible por diseño. Menciona en la demo: "Verificado sin race conditions por construcción". |
+| **Integración Nebius Token Factory (auth, APIs, cobro)** | Bajo (para el hackathon) | **Mockea el backend.** Muestra un flujo: "Usuario ingresa código" → "Nemotron analiza" → "Kernel generado y compilado" → "Benchmark en H100/Nebius". No necesitas conectar de verdad a Token Factory; simula el ID de token y el costo reducido de VR
