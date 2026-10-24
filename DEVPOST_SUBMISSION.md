@@ -19,7 +19,7 @@ We built **OmniKernel**: an autonomous, agentic GPU engineer powered by **NVIDIA
 1. **Hardware-Specific JIT Synthesis (NVIDIA Hopper H100):**
    - Ingests naive PyTorch matrix operators (FlashAttention, Fused RMSNorm, GeLU, LayerNorm, Quantized FP8 GEMM).
    - Generates fully optimized Triton kernels utilizing Hopper Tensor Memory Accelerator (**TMA**) instructions (`cp.async.bulk.tensor`) and asynchronous Tensor Core matrix instructions (`wgmma.mma_async`).
-   - Applies $64 \times 64$ SRAM L2 tiling to eliminate DRAM round-trips for score matrix materialization.
+   - Applies $64 \times 64$ SM Shared Memory (SRAM) tiling to eliminate DRAM round-trips for score matrix materialization.
 
 2. **Dynamic Sequence Shape & Boundary Masking:**
    - Solves the production edge case identified by kernel engineers: applies explicit boundary masking (`mask_k = (start_n + offs_n)[None, :] < N_CTX`, `qk = tl.where(mask_k, qk, float("-inf"))`) so that non-power-of-two and variable sequence lengths (e.g. 73, 127, 257) execute seamlessly without memory segmentation faults or online softmax corruption.
