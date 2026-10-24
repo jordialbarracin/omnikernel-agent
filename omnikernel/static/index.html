@@ -20,18 +20,20 @@
           },
           colors: {
             app: {
-              canvas: '#07080B',
-              sidebar: '#0C0E14',
-              surface: '#11141D',
-              surfaceHover: '#181C28',
-              surfaceActive: '#1F2433',
-              border: '#1F2432',
-              muted: '#71788E',
-              emerald: '#10B981',
-              nvidia: '#76B900',
-              cyan: '#00D1FF',
-              rose: '#F43F5E',
-              amber: '#F59E0B'
+              canvas: '#090A0D',
+              sidebar: '#0E1015',
+              surface: '#14171E',
+              surfaceHover: '#1A1E27',
+              surfaceActive: '#222733',
+              border: '#1E232F',
+              borderSubtle: '#171A23',
+              muted: '#858E9D',
+              subtle: '#505765',
+              fg: '#EEF2F6',
+              steel: '#58A6FF',
+              emerald: '#3FB950',
+              amber: '#D29922',
+              rose: '#F85149'
             }
           }
         }
@@ -39,14 +41,14 @@
     }
   </script>
   <style>
-    body { background-color: #07080B; color: #F1F3F9; }
+    body { background-color: #090A0D; color: #EEF2F6; }
     .custom-scroll::-webkit-scrollbar { width: 5px; height: 5px; }
-    .custom-scroll::-webkit-scrollbar-track { background: #0C0E14; }
-    .custom-scroll::-webkit-scrollbar-thumb { background: #1F2432; border-radius: 4px; }
-    .custom-scroll::-webkit-scrollbar-thumb:hover { background: #2D3446; }
+    .custom-scroll::-webkit-scrollbar-track { background: #0E1015; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: #1E232F; border-radius: 4px; }
+    .custom-scroll::-webkit-scrollbar-thumb:hover { background: #2A3140; }
   </style>
 </head>
-<body class="h-screen w-screen overflow-hidden flex flex-col font-sans selection:bg-app-nvidia/30 selection:text-white">
+<body class="h-screen w-screen overflow-hidden flex flex-col font-sans selection:bg-app-steel/20 selection:text-white">
 
   <!-- Top Studio Header -->
   <header class="h-14 px-4 border-b border-app-border bg-app-sidebar flex items-center justify-between flex-shrink-0 select-none">
@@ -57,9 +59,9 @@
       <div>
         <div class="flex items-center gap-2">
           <span class="text-xs font-bold text-white font-mono tracking-tight">
-            AETHERIA // <span class="text-app-nvidia">OMNIKERNEL™</span>
+            AETHERIA // <span class="text-white">OMNIKERNEL™</span>
           </span>
-          <span class="text-[9px] font-mono px-1.5 py-0.2 rounded bg-app-surface text-app-nvidia border border-app-nvidia/30 font-bold">
+          <span class="text-[9px] font-mono px-1.5 py-0.2 rounded bg-app-surface text-app-muted border border-app-border font-medium">
             TRITON JIT COMPILER STUDIO
           </span>
         </div>
@@ -71,24 +73,24 @@
     <div class="hidden lg:flex items-center gap-3 text-xs font-mono">
       <div class="flex items-center gap-2 px-3 py-1 rounded-lg bg-app-surface border border-app-border text-[11px]">
         <span class="text-app-muted">Arquitectura:</span>
-        <select id="gpuSelect" class="bg-transparent text-white font-bold focus:outline-none cursor-pointer">
-          <option value="NVIDIA Hopper H100 (Tensor Cores / 80GB HBM3)" class="bg-zinc-900">NVIDIA Hopper H100 (sm_90a)</option>
-          <option value="NVIDIA Ada Lovelace RTX 4090" class="bg-zinc-900">Ada Lovelace (sm_89)</option>
-          <option value="NVIDIA Ampere A100 (40GB/80GB SXM4)" class="bg-zinc-900">Ampere A100 (sm_80)</option>
+        <select id="gpuSelect" class="bg-transparent text-white font-medium focus:outline-none cursor-pointer">
+          <option value="NVIDIA Hopper H100 (Tensor Cores / 80GB HBM3)" class="bg-[#181B24]">NVIDIA Hopper H100 (sm_90a)</option>
+          <option value="NVIDIA Ada Lovelace RTX 4090" class="bg-[#181B24]">Ada Lovelace (sm_89)</option>
+          <option value="NVIDIA Ampere A100 (40GB/80GB SXM4)" class="bg-[#181B24]">Ampere A100 (sm_80)</option>
         </select>
         <span class="text-app-border">|</span>
         <span class="text-app-muted">Precisión:</span>
         <div class="flex items-center gap-1" id="precision-group">
-          <button type="button" class="precision-btn px-1.5 py-0.2 rounded bg-app-nvidia/20 text-app-nvidia font-bold" data-val="FP16">FP16</button>
-          <button type="button" class="precision-btn px-1.5 py-0.2 rounded text-app-muted hover:text-white" data-val="BF16">BF16</button>
-          <button type="button" class="precision-btn px-1.5 py-0.2 rounded text-app-muted hover:text-white" data-val="FP8">FP8</button>
+          <button type="button" class="precision-btn px-2 py-0.5 rounded bg-app-surfaceActive text-white border border-app-border font-medium" data-val="FP16">FP16</button>
+          <button type="button" class="precision-btn px-2 py-0.5 rounded text-app-muted hover:text-white" data-val="BF16">BF16</button>
+          <button type="button" class="precision-btn px-2 py-0.5 rounded text-app-muted hover:text-white" data-val="FP8">FP8</button>
         </div>
       </div>
     </div>
 
     <!-- Right Actions -->
     <div class="flex items-center gap-2">
-      <button onclick="runOptimize()" id="optimizeBtn" class="h-8 px-4 rounded-lg bg-gradient-to-r from-app-nvidia to-emerald-400 text-black font-bold text-xs font-mono transition flex items-center gap-1.5 shadow-lg shadow-app-nvidia/20 active:scale-95">
+      <button onclick="runOptimize()" id="optimizeBtn" class="h-8 px-4 rounded-lg bg-white hover:bg-zinc-200 text-[#0D0F14] font-semibold text-xs font-mono transition flex items-center gap-1.5 shadow-sm active:scale-95">
         <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
         </svg>
@@ -110,40 +112,40 @@
     <!-- LEFT PANEL: CANONICAL BOTTLENECK PATTERNS -->
     <aside class="w-64 bg-app-sidebar border-r border-app-border flex flex-col justify-between flex-shrink-0 select-none">
       <div>
-        <div class="h-9 px-3 border-b border-app-border flex items-center justify-between text-[10px] font-mono uppercase tracking-wider text-app-muted font-bold">
+        <div class="h-9 px-3 border-b border-app-border flex items-center justify-between text-[10px] font-mono uppercase tracking-wider text-app-subtle font-semibold">
           <span>Patrones Cuello de Botella</span>
-          <span class="text-zinc-500">4 KERNELS</span>
+          <span class="text-app-muted">4 KERNELS</span>
         </div>
 
         <div class="p-2 space-y-1 font-mono text-xs">
           <div onclick="selectPattern('fused_attention')" id="pat-fused_attention" class="px-2.5 py-2 rounded-lg bg-app-surface text-white border border-app-border flex flex-col gap-1 cursor-pointer transition">
-            <div class="font-bold text-white flex items-center justify-between">
+            <div class="font-semibold text-white flex items-center justify-between">
               <span>1. Fused Attention</span>
-              <span class="text-[9px] px-1 py-0.2 rounded bg-app-nvidia/20 text-app-nvidia">3.42x</span>
+              <span class="text-[9px] px-1.5 py-0.2 rounded bg-app-surfaceActive text-app-emerald border border-app-emerald/20">3.42x</span>
             </div>
             <div class="text-[10px] text-app-muted line-clamp-1 font-sans">FlashAttention O(N) memory tile</div>
           </div>
 
           <div onclick="selectPattern('fused_mlp_norm')" id="pat-fused_mlp_norm" class="px-2.5 py-2 rounded-lg text-app-muted hover:text-white hover:bg-app-surface flex flex-col gap-1 cursor-pointer transition">
-            <div class="font-bold flex items-center justify-between">
+            <div class="font-semibold flex items-center justify-between">
               <span>2. LayerNorm + GELU</span>
-              <span class="text-[9px] px-1 py-0.2 rounded bg-zinc-800 text-zinc-400">2.8x</span>
+              <span class="text-[9px] px-1.5 py-0.2 rounded bg-app-surface text-app-muted">2.8x</span>
             </div>
             <div class="text-[10px] text-app-muted line-clamp-1 font-sans">Fusion of elementwise memory pass</div>
           </div>
 
           <div onclick="selectPattern('fp8_quantized_gemm')" id="pat-fp8_quantized_gemm" class="px-2.5 py-2 rounded-lg text-app-muted hover:text-white hover:bg-app-surface flex flex-col gap-1 cursor-pointer transition">
-            <div class="font-bold flex items-center justify-between">
+            <div class="font-semibold flex items-center justify-between">
               <span>3. FP8 Quantized GEMM</span>
-              <span class="text-[9px] px-1 py-0.2 rounded bg-zinc-800 text-zinc-400">4.1x</span>
+              <span class="text-[9px] px-1.5 py-0.2 rounded bg-app-surface text-app-muted">4.1x</span>
             </div>
             <div class="text-[10px] text-app-muted line-clamp-1 font-sans">On-the-fly dequant in SRAM</div>
           </div>
 
           <div onclick="selectPattern('moe_routing_scatter')" id="pat-moe_routing_scatter" class="px-2.5 py-2 rounded-lg text-app-muted hover:text-white hover:bg-app-surface flex flex-col gap-1 cursor-pointer transition">
-            <div class="font-bold flex items-center justify-between">
+            <div class="font-semibold flex items-center justify-between">
               <span>4. Top-K MoE Routing</span>
-              <span class="text-[9px] px-1 py-0.2 rounded bg-zinc-800 text-zinc-400">3.1x</span>
+              <span class="text-[9px] px-1.5 py-0.2 rounded bg-app-surface text-app-muted">3.1x</span>
             </div>
             <div class="text-[10px] text-app-muted line-clamp-1 font-sans">Fused token scatter to experts</div>
           </div>
@@ -152,21 +154,21 @@
 
       <!-- Nebius Cluster Cost Savings -->
       <div class="p-3 border-t border-app-border space-y-2">
-        <div class="text-[10px] font-mono uppercase tracking-wider text-app-muted font-bold">
+        <div class="text-[10px] font-mono uppercase tracking-wider text-app-subtle font-semibold">
           Impacto Económico H100
         </div>
         <div class="p-2.5 rounded-xl bg-app-surface border border-app-border text-[11px] font-mono space-y-1">
           <div class="flex items-center justify-between">
             <span class="text-app-muted">Tiempo Reducido:</span>
-            <span class="text-app-emerald font-bold">-68% ms</span>
+            <span class="text-app-emerald font-semibold">-68% ms</span>
           </div>
           <div class="flex items-center justify-between">
             <span class="text-app-muted">Ahorro Clúster 8x:</span>
-            <span class="text-white font-bold">$14.40 / h</span>
+            <span class="text-white font-semibold">$14.40 / h</span>
           </div>
           <div class="flex items-center justify-between">
-            <span class="text-app-muted">Ahorro Proyectado:</span>
-            <span class="text-app-nvidia font-bold">$126k / año</span>
+            <span class="text-app-muted">Ahorro Anual:</span>
+            <span class="text-app-emerald font-semibold">$126k / año</span>
           </div>
         </div>
       </div>
@@ -178,13 +180,13 @@
       <!-- Split Code Panes Header -->
       <div class="h-9 px-4 border-b border-app-border bg-app-sidebar flex items-center justify-between text-xs font-mono select-none flex-shrink-0">
         <div class="flex items-center gap-4">
-          <span class="text-app-rose font-semibold flex items-center gap-1.5">
+          <span class="text-app-rose font-medium flex items-center gap-1.5">
             <span class="w-1.5 h-1.5 rounded-full bg-app-rose"></span>
             PyTorch Baseline (Memory Bound)
           </span>
           <span class="text-app-border">|</span>
-          <span class="text-app-nvidia font-semibold flex items-center gap-1.5">
-            <span class="w-1.5 h-1.5 rounded-full bg-app-nvidia"></span>
+          <span class="text-app-emerald font-medium flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-app-emerald"></span>
             OmniKernel JIT Synthesized Triton
           </span>
         </div>
@@ -206,8 +208,8 @@
 
         <!-- Right: OpenAI Triton Kernel Code -->
         <div class="flex flex-col h-full overflow-hidden bg-app-canvas">
-          <div class="p-4 flex-1 overflow-auto custom-scroll bg-black/40">
-            <pre class="font-mono text-xs text-emerald-300 leading-relaxed"><code id="tritonCode">// Pulsa "Synthesize &amp; Compile JIT" para generar el kernel...</code></pre>
+          <div class="p-4 flex-1 overflow-auto custom-scroll bg-[#0a0c10]">
+            <pre class="font-mono text-xs text-[#7ee787] leading-relaxed"><code id="tritonCode">// Pulsa "Synthesize &amp; Compile JIT" para generar el kernel...</code></pre>
           </div>
         </div>
 
@@ -215,7 +217,7 @@
 
       <!-- Compiler Log Drawer -->
       <div class="h-32 border-t border-app-border bg-app-surface p-3 overflow-y-auto custom-scroll font-mono text-[11px] text-zinc-400 leading-relaxed flex-shrink-0">
-        <div class="text-[10px] text-app-muted uppercase tracking-wider font-bold mb-1">Análisis de Jerarquía de Memoria (Nemotron Compiler):</div>
+        <div class="text-[10px] text-app-muted uppercase tracking-wider font-semibold mb-1">Análisis de Jerarquía de Memoria (Nemotron Compiler):</div>
         <div id="compilerAnalysis" class="text-zinc-300">
           Selecciona un patrón de cuello de botella y haz clic en "Synthesize &amp; Compile JIT" para analizar el acceso a memoria HBM/SRAM.
         </div>
@@ -228,12 +230,12 @@
       
       <!-- Mathematical Equivalence Shield -->
       <div class="p-4 rounded-xl bg-app-surface border border-app-border space-y-3">
-        <div class="text-[10px] font-mono uppercase tracking-wider text-app-muted font-bold flex items-center justify-between">
+        <div class="text-[10px] font-mono uppercase tracking-wider text-app-subtle font-semibold flex items-center justify-between">
           <span>Verificación Numérica</span>
           <span class="w-1.5 h-1.5 rounded-full bg-app-emerald"></span>
         </div>
 
-        <div class="p-3 rounded-lg bg-black/40 border border-app-emerald/30 text-app-emerald text-xs font-mono font-bold flex items-center gap-2">
+        <div class="p-2.5 rounded-lg bg-app-canvas border border-app-emerald/20 text-app-emerald text-xs font-mono font-medium flex items-center gap-2">
           <svg class="w-4 h-4 text-app-emerald" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
           </svg>
@@ -247,7 +249,7 @@
           </div>
           <div class="flex items-center justify-between">
             <span>Error Absoluto Máx:</span>
-            <span id="maxDiff" class="text-app-emerald font-bold">0.000488</span>
+            <span id="maxDiff" class="text-app-emerald font-semibold">0.000488</span>
           </div>
         </div>
       </div>
@@ -256,20 +258,20 @@
       <div class="grid grid-cols-2 gap-3 font-mono">
         <div class="p-3 rounded-xl bg-app-surface border border-app-border">
           <div class="text-[10px] text-app-muted uppercase">Speedup</div>
-          <div id="speedupDisplay" class="text-2xl font-bold text-app-nvidia mt-1">3.42x</div>
-          <div class="text-[10px] text-zinc-400 mt-0.5">1.42ms vs 4.85ms</div>
+          <div id="speedupDisplay" class="text-2xl font-bold text-white mt-1">3.42x</div>
+          <div class="text-[10px] text-app-muted mt-0.5">1.42ms vs 4.85ms</div>
         </div>
 
         <div class="p-3 rounded-xl bg-app-surface border border-app-border">
           <div class="text-[10px] text-app-muted uppercase">VRAM Saved</div>
-          <div id="vramSavingDisplay" class="text-2xl font-bold text-app-cyan mt-1">-78.4%</div>
-          <div class="text-[10px] text-zinc-400 mt-0.5">37 MB vs 168 MB</div>
+          <div id="vramSavingDisplay" class="text-2xl font-bold text-white mt-1">-78.4%</div>
+          <div class="text-[10px] text-app-muted mt-0.5">37 MB vs 168 MB</div>
         </div>
       </div>
 
       <!-- Benchmark Comparison Chart -->
       <div class="p-4 rounded-xl bg-app-surface border border-app-border flex-1 flex flex-col justify-between">
-        <div class="text-[10px] font-mono uppercase tracking-wider text-app-muted font-bold mb-2">
+        <div class="text-[10px] font-mono uppercase tracking-wider text-app-subtle font-semibold mb-2">
           Latencia vs VRAM (Menor es mejor)
         </div>
         <div class="h-44">
@@ -292,8 +294,8 @@
     function showToast(message) {
       const container = document.getElementById('toast-container');
       const toast = document.createElement('div');
-      toast.className = 'pointer-events-auto flex items-center gap-2 px-4 py-2.5 rounded-xl border border-app-border bg-app-sidebar text-zinc-200 shadow-2xl transition-all duration-300 transform translate-y-2 opacity-0';
-      toast.innerHTML = `<span class="text-app-nvidia font-bold">✔</span> <span>${message}</span>`;
+      toast.className = 'pointer-events-auto flex items-center gap-2 px-4 py-2.5 rounded-xl border border-app-border bg-app-sidebar text-zinc-200 shadow-xl transition-all duration-300 transform translate-y-2 opacity-0';
+      toast.innerHTML = `<span class="text-app-emerald font-bold">✔</span> <span>${message}</span>`;
       container.appendChild(toast);
       requestAnimationFrame(() => toast.classList.remove('translate-y-2', 'opacity-0'));
       setTimeout(() => {
@@ -314,16 +316,16 @@
             {
               label: 'PyTorch Baseline',
               data: [pyLatency, pyVram],
-              backgroundColor: 'rgba(244, 63, 94, 0.75)',
-              borderColor: 'rgb(244, 63, 94)',
+              backgroundColor: 'rgba(248, 81, 73, 0.7)',
+              borderColor: 'rgb(248, 81, 73)',
               borderWidth: 1,
               borderRadius: 4
             },
             {
               label: 'OmniKernel Triton',
               data: [trLatency, trVram],
-              backgroundColor: 'rgba(118, 185, 0, 0.85)',
-              borderColor: 'rgb(118, 185, 0)',
+              backgroundColor: 'rgba(88, 166, 255, 0.8)',
+              borderColor: 'rgb(88, 166, 255)',
               borderWidth: 1,
               borderRadius: 4
             }
@@ -333,11 +335,11 @@
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
-            legend: { labels: { color: '#71788E', font: { size: 10, family: 'Geist Mono' } } }
+            legend: { labels: { color: '#7E899D', font: { size: 10, family: 'Geist Mono' } } }
           },
           scales: {
-            x: { ticks: { color: '#71788E', font: { size: 9 } }, grid: { color: '#1F2432' } },
-            y: { ticks: { color: '#71788E', font: { size: 9 } }, grid: { color: '#1F2432' } }
+            x: { ticks: { color: '#7E899D', font: { size: 9 } }, grid: { color: '#1B1E28' } },
+            y: { ticks: { color: '#7E899D', font: { size: 9 } }, grid: { color: '#1B1E28' } }
           }
         }
       });
@@ -410,9 +412,9 @@
     document.querySelectorAll('.precision-btn').forEach(b => {
       b.addEventListener('click', () => {
         document.querySelectorAll('.precision-btn').forEach(btn => {
-          btn.className = "precision-btn px-1.5 py-0.2 rounded text-app-muted hover:text-white";
+          btn.className = "precision-btn px-2 py-0.5 rounded text-app-muted hover:text-white";
         });
-        b.className = "precision-btn px-1.5 py-0.2 rounded bg-app-nvidia/20 text-app-nvidia font-bold";
+        b.className = "precision-btn px-2 py-0.5 rounded bg-app-surfaceActive text-white border border-app-border font-medium";
         selectedPrecision = b.dataset.val;
       });
     });
