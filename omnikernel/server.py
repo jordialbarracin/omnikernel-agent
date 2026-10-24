@@ -70,6 +70,14 @@ def optimize_kernel(req: OptimizeRequest):
         "profiling": prof_res
     }
 
+@app.get("/api/benchmark/llama")
+def benchmark_llama(batch_size: int = 4, seq_len: int = 2048):
+    try:
+        from benchmark_llama_layer import run_llama_layer_benchmark
+        return run_llama_layer_benchmark(batch_size=batch_size, seq_len=seq_len)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.get("/api/health")
 def health():
     return {
