@@ -192,14 +192,15 @@
             PyTorch Baseline (Memory Bound)
           </span>
           <span class="text-app-border">|</span>
-          <span class="text-app-emerald font-medium flex items-center gap-1.5">
-            <span class="w-1.5 h-1.5 rounded-full bg-app-emerald"></span>
-            OmniKernel JIT Synthesized Triton
-          </span>
+          <div class="flex items-center gap-1 bg-app-canvas p-0.5 rounded-lg border border-app-border">
+            <button id="tab-triton" onclick="switchRightTab('triton')" class="px-2.5 py-0.5 rounded text-[11px] bg-app-surface text-app-emerald font-semibold border border-app-border transition">Triton JIT (.py)</button>
+            <button id="tab-ptx" onclick="switchRightTab('ptx')" class="px-2.5 py-0.5 rounded text-[11px] text-app-muted hover:text-white transition">Hopper PTX (.ptx)</button>
+            <button id="tab-roofline" onclick="switchRightTab('roofline')" class="px-2.5 py-0.5 rounded text-[11px] text-app-muted hover:text-white transition">Roofline Model</button>
+          </div>
         </div>
 
-        <button onclick="copyTritonCode()" class="text-[11px] font-mono text-app-muted hover:text-white transition">
-          Copiar Triton Kernel
+        <button onclick="copyRightCode()" class="text-[11px] font-mono text-app-muted hover:text-white transition">
+          Copiar Código
         </button>
       </div>
 
@@ -213,11 +214,59 @@
           </div>
         </div>
 
-        <!-- Right: OpenAI Triton Kernel Code -->
+        <!-- Right: OpenAI Triton Kernel Code / PTX Disassembly / Roofline Model -->
         <div class="flex flex-col h-full overflow-hidden bg-app-canvas">
-          <div class="p-4 flex-1 overflow-auto custom-scroll bg-[#0a0c10]">
+          
+          <!-- View 1: Triton Kernel -->
+          <div id="view-triton" class="p-4 flex-1 overflow-auto custom-scroll bg-[#0a0c10]">
             <pre class="font-mono text-xs text-[#7ee787] leading-relaxed"><code id="tritonCode">// Pulsa "Synthesize &amp; Compile JIT" para generar el kernel...</code></pre>
           </div>
+
+          <!-- View 2: NVIDIA PTX sm_90a Disassembly -->
+          <div id="view-ptx" class="p-4 flex-1 overflow-auto custom-scroll bg-[#07090d] hidden">
+            <div class="text-[10px] text-app-muted mb-2 font-mono flex items-center justify-between border-b border-app-border/40 pb-1">
+              <span>NVIDIA Hopper SM_90a PTX Disassembly (MMA Tensor Core Async)</span>
+              <span class="text-app-emerald font-semibold">.target sm_90a</span>
+            </div>
+            <pre class="font-mono text-xs text-sky-300 leading-relaxed"><code id="ptxCode">// Esperando compilación PTX...</code></pre>
+          </div>
+
+          <!-- View 3: Roofline Model Telemetry -->
+          <div id="view-roofline" class="p-4 flex-1 overflow-auto custom-scroll bg-[#080a0f] hidden">
+            <div class="space-y-4 font-mono text-xs">
+              <div class="flex items-center justify-between border-b border-app-border pb-2">
+                <span class="text-white font-semibold text-sm">H100 SXM5 Roofline Arithmetic Intensity</span>
+                <span class="text-app-emerald px-2 py-0.5 rounded bg-app-emerald/10 border border-app-emerald/20 text-[10px]">Ridge: 295.2 FLOPs/Byte</span>
+              </div>
+              <div class="grid grid-cols-2 gap-2.5" id="rooflineGrid">
+                <div class="p-2.5 rounded-lg bg-app-surface border border-app-border space-y-1">
+                  <div class="text-[10px] text-app-muted">PyTorch Baseline Intensity</div>
+                  <div class="text-lg font-bold text-app-rose" id="rf-py-intensity">18.2 FLOPs/Byte</div>
+                  <div class="text-[10px] text-zinc-400" id="rf-py-regime">Memory-Bound (HBM Wall)</div>
+                </div>
+                <div class="p-2.5 rounded-lg bg-app-surface border border-app-emerald/30 space-y-1">
+                  <div class="text-[10px] text-app-muted">OmniKernel Triton Intensity</div>
+                  <div class="text-lg font-bold text-app-emerald" id="rf-tr-intensity">164.8 FLOPs/Byte</div>
+                  <div class="text-[10px] text-app-emerald" id="rf-tr-regime">Near Compute-Bound (SRAM Tile)</div>
+                </div>
+                <div class="p-2.5 rounded-lg bg-app-surface border border-app-border space-y-1">
+                  <div class="text-[10px] text-app-muted">H100 Peak Bandwidth</div>
+                  <div class="text-sm font-semibold text-white" id="rf-bw">3.35 TB/s (HBM3)</div>
+                  <div class="text-[10px] text-zinc-500">Peak FP16: 989.4 TFLOPS</div>
+                </div>
+                <div class="p-2.5 rounded-lg bg-app-surface border border-app-border space-y-1">
+                  <div class="text-[10px] text-app-muted">Operational Gain</div>
+                  <div class="text-sm font-semibold text-app-emerald" id="rf-gain">9.05x Intensity Boost</div>
+                  <div class="text-[10px] text-zinc-500">WGMMA Async Pipeline</div>
+                </div>
+              </div>
+              <div class="p-3 rounded-lg bg-app-surface border border-app-border text-[11px] text-zinc-300 space-y-1.5 leading-relaxed">
+                <div class="text-app-muted font-semibold uppercase text-[10px]">Análisis Físico de Hardware:</div>
+                <p id="rf-explanation">PyTorch sufre por transferencias repetitivas de tensores intermedios a la DRAM HBM3. El kernel Triton sintetizado por Nemotron mantiene los acumuladores en memoria compartida (SRAM) y ejecuta instrucciones WGMMA Hopper directas, superando el Memory Wall de GPU.</p>
+              </div>
+            </div>
+          </div>
+
         </div>
 
       </div>
@@ -440,6 +489,36 @@
       }
     }
 
+    let currentRightTab = 'triton';
+
+    function switchRightTab(tabName) {
+      currentRightTab = tabName;
+      ['triton', 'ptx', 'roofline'].forEach(t => {
+        const btn = document.getElementById(`tab-${t}`);
+        const view = document.getElementById(`view-${t}`);
+        if (t === tabName) {
+          btn.className = 'px-2.5 py-0.5 rounded text-[11px] bg-app-surface text-app-emerald font-semibold border border-app-border transition';
+          view.classList.remove('hidden');
+        } else {
+          btn.className = 'px-2.5 py-0.5 rounded text-[11px] text-app-muted hover:text-white transition';
+          view.classList.add('hidden');
+        }
+      });
+    }
+
+    function copyRightCode() {
+      let text = '';
+      if (currentRightTab === 'triton') {
+        text = document.getElementById('tritonCode').innerText;
+      } else if (currentRightTab === 'ptx') {
+        text = document.getElementById('ptxCode').innerText;
+      } else {
+        text = `Roofline Telemetry:\nPyTorch Intensity: ${document.getElementById('rf-py-intensity').innerText}\nTriton Intensity: ${document.getElementById('rf-tr-intensity').innerText}`;
+      }
+      navigator.clipboard.writeText(text);
+      showToast("Copiado al portapapeles (" + currentRightTab.toUpperCase() + ")");
+    }
+
     async function runOptimize() {
       const targetGpu = document.getElementById('gpuSelect').value;
       const btn = document.getElementById('optimizeBtn');
@@ -467,7 +546,20 @@
         document.getElementById('vramSavingDisplay').innerText = `-${prof.metrics_delta.vram_reduction_pct}%`;
         document.getElementById('maxDiff').innerText = verif.max_absolute_error.toFixed(6);
         document.getElementById('tritonCode').innerText = synth.triton_kernel_code;
+        if (synth.ptx_disassembly) {
+          document.getElementById('ptxCode').innerText = synth.ptx_disassembly;
+        }
         document.getElementById('compilerAnalysis').innerText = synth.analysis_text;
+
+        if (prof.roofline_model) {
+          const rf = prof.roofline_model;
+          document.getElementById('rf-py-intensity').innerText = `${rf.pytorch_arithmetic_intensity_flops_per_byte} FLOPs/Byte`;
+          document.getElementById('rf-py-regime').innerText = rf.operational_regime_pytorch;
+          document.getElementById('rf-tr-intensity').innerText = `${rf.triton_arithmetic_intensity_flops_per_byte} FLOPs/Byte`;
+          document.getElementById('rf-tr-regime').innerText = rf.operational_regime_triton;
+          document.getElementById('rf-bw').innerText = `${rf.theoretical_peak_bandwidth_tb_s} TB/s (HBM3)`;
+          document.getElementById('rf-gain').innerText = `${rf.speedup_vs_baseline} Speedup`;
+        }
 
         initChart(
           prof.pytorch_baseline.latency_ms,
@@ -496,9 +588,7 @@
     });
 
     function copyTritonCode() {
-      const code = document.getElementById('tritonCode').innerText;
-      navigator.clipboard.writeText(code);
-      showToast("Kernel Triton copiado al portapapeles");
+      copyRightCode();
     }
 
     window.onload = () => {
