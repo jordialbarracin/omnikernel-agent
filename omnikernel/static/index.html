@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OmniKernel • Autonomous GPU Triton Compiler &amp; Architect</title>
+  <title>AETHERIA // OMNIKERNEL™ • Autonomous GPU Triton Compiler &amp; Architect</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -65,44 +65,44 @@
 
   <div class="fixed inset-0 bg-grid-pattern pointer-events-none z-0"></div>
 
-  <!-- Top Sticky Navigation (shadcn/ui style) -->
-  <header class="border-b border-zinc-800/80 bg-zinc-950/70 backdrop-blur-xl sticky top-0 z-50">
+  <!-- Top Sticky Navigation (AETHERIA // OMNIKERNEL) -->
+  <header class="border-b border-zinc-800/80 bg-zinc-950/80 backdrop-blur-2xl sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="relative flex items-center justify-center w-9 h-9 rounded-xl bg-zinc-900 border border-zinc-800 shadow-inner group">
-          <div class="absolute -inset-0.5 bg-gradient-to-r from-emerald-500 to-cyan-400 rounded-xl blur opacity-35 group-hover:opacity-75 transition duration-500"></div>
-          <svg class="relative w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
-          </svg>
+      
+      <!-- Brand & Product Title -->
+      <div class="flex items-center gap-3.5">
+        <div class="relative flex items-center justify-center w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800 shadow-inner group">
+          <img src="/static/assets/logo-omnikernel.svg" alt="OmniKernel Logo" class="w-7 h-7">
         </div>
         <div>
           <div class="flex items-center gap-2">
-            <span class="font-extrabold text-sm sm:text-base tracking-tight text-zinc-100">
-              Omni<span class="text-emerald-400">Kernel</span>
+            <span class="font-extrabold text-sm sm:text-base tracking-tight text-white font-mono">
+              AETHERIA // <span class="text-emerald-400">OMNIKERNEL™</span>
             </span>
-            <span class="inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[10px] font-mono font-medium ring-1 ring-inset ring-emerald-500/30 bg-emerald-500/10 text-emerald-400">
+            <span class="inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[9px] font-mono font-medium ring-1 ring-inset ring-emerald-500/30 bg-emerald-500/10 text-emerald-400">
               <span class="relative flex h-1.5 w-1.5">
                 <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                 <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
               </span>
-              v1.0-Hopper-H100
+              H100-SXM5 JIT
             </span>
           </div>
-          <p class="text-[11px] text-zinc-400 hidden sm:block">
-            Autonomous GPU Compiler Engine &bull; Nebius x NVIDIA Hackathon &bull; Port 8000
+          <p class="text-[11px] text-zinc-400 font-mono hidden sm:block">
+            Hardware-Aware Triton Synthesis &bull; Nebius Token Factory &bull; Port 8000
           </p>
         </div>
       </div>
 
+      <!-- Controls & Links -->
       <div class="flex items-center gap-3">
         <div class="hidden md:flex items-center gap-2 bg-zinc-900/80 px-3 py-1.5 rounded-xl border border-zinc-800 text-xs text-zinc-300 font-mono">
           <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-          <span>Engine: <b class="text-white">Nemotron-3.5</b></span>
+          <span>LLM: <b class="text-white">Nemotron-3.5</b></span>
           <span class="text-zinc-600">&bull;</span>
-          <span>Cloud: <b class="text-cyan-400">Nebius Token Factory</b></span>
+          <span>Compute: <b class="text-cyan-400">Nebius GPU Factory</b></span>
         </div>
-        <a href="http://127.0.0.1:8080" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-200 transition flex items-center gap-1.5 shadow-sm active:scale-95">
-          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <a href="http://127.0.0.1:8080" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-200 transition flex items-center gap-1.5 shadow-sm active:scale-95 font-mono">
+          <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 17l-5-5m0 0l5-5m-5 5h12" />
           </svg>
           <span>Mission Control</span>
@@ -113,13 +113,15 @@
 
   <!-- Hero & Controls -->
   <main class="relative z-10 flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    
+    <!-- Top Configuration & Performance Row -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
       <!-- Left Column: Settings & Configuration -->
       <div class="bg-zinc-900/40 backdrop-blur-xl border border-zinc-800/80 rounded-2xl p-6 flex flex-col justify-between shadow-xl">
         <div>
           <div class="flex items-center justify-between mb-4">
-            <h2 class="text-base font-bold text-white flex items-center gap-2">
+            <h2 class="text-sm font-bold text-white flex items-center gap-2 font-mono uppercase tracking-wider">
               <svg class="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
               </svg>
@@ -139,7 +141,7 @@
               <option value="fp8_quantized_gemm">3. FP8 Quantized MatMul (On-The-Fly)</option>
               <option value="moe_routing_scatter">4. Top-K MoE Routing Dispatcher</option>
             </select>
-            <p id="patternDesc" class="text-xs text-zinc-400 mt-2 leading-relaxed">
+            <p id="patternDesc" class="text-xs text-zinc-400 mt-2 leading-relaxed font-sans">
               Fuses Q @ K^T, online Softmax scaling, and @ V without writing the O(N^2) attention matrix to HBM.
             </p>
           </div>
@@ -168,7 +170,7 @@
 
         <!-- Action Button -->
         <div class="mt-4">
-          <button id="optimizeBtn" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-400 hover:from-emerald-400 hover:to-emerald-300 text-zinc-950 font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition duration-200 shadow-lg shadow-emerald-500/25 active:scale-95">
+          <button id="optimizeBtn" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-400 hover:from-emerald-400 hover:to-emerald-300 text-zinc-950 font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition duration-200 shadow-lg shadow-emerald-500/25 active:scale-95 font-mono">
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
@@ -195,7 +197,7 @@
             </svg>
           </div>
           <div class="my-3">
-            <span id="speedupDisplay" class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">3.42x</span>
+            <span id="speedupDisplay" class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight font-mono">3.42x</span>
             <span class="inline-flex items-center rounded-md px-1.5 py-0.5 text-xs font-mono font-medium ring-1 ring-inset ring-emerald-500/30 bg-emerald-500/10 text-emerald-400 ml-2">+242% Faster</span>
           </div>
           <div class="text-[11px] text-zinc-400 font-mono">
@@ -212,8 +214,8 @@
             </svg>
           </div>
           <div class="my-3">
-            <span id="vramSavingDisplay" class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">-78.0%</span>
-            <span class="inline-flex items-center rounded-md px-1.5 py-0.5 text-xs font-mono font-medium ring-1 ring-inset ring-cyan-500/30 bg-cyan-500/10 text-cyan-400 ml-2">Saved</span>
+            <span id="vramSavingDisplay" class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight font-mono">-78.0%</span>
+            <span class="inline-flex items-center rounded-md px-1.5 py-0.5 text-xs font-mono font-medium ring-1 ring-inset ring-cyan-500/30 bg-cyan-500/10 text-cyan-400 ml-2 font-mono">Saved</span>
           </div>
           <div class="text-[11px] text-zinc-400 font-mono">
             Peak buffer: <span id="baselineVram" class="text-rose-400">168 MB</span> &rarr; <span id="kernelVram" class="text-cyan-400 font-bold">37 MB</span>
@@ -242,7 +244,7 @@
         <!-- Chart Container -->
         <div class="md:col-span-3 bg-zinc-900/40 backdrop-blur-xl border border-zinc-800/80 rounded-2xl p-6 shadow-xl">
           <div class="flex items-center justify-between mb-4">
-            <h3 class="text-xs sm:text-sm font-bold text-white flex items-center gap-2">
+            <h3 class="text-xs sm:text-sm font-bold text-white flex items-center gap-2 font-mono">
               <svg class="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
               </svg>
@@ -317,7 +319,7 @@
       
       <!-- Architectural Deep Dive -->
       <div class="lg:col-span-2 bg-zinc-900/40 backdrop-blur-xl border border-zinc-800/80 rounded-2xl p-6 shadow-xl">
-        <h3 class="text-sm font-bold text-white flex items-center gap-2 mb-3">
+        <h3 class="text-sm font-bold text-white flex items-center gap-2 mb-3 font-mono">
           <svg class="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
           </svg>
@@ -331,7 +333,7 @@ Select a pattern and synthesize to view Nemotron's memory hierarchy analysis.
       <!-- Nebius Economic Impact -->
       <div class="bg-zinc-900/40 backdrop-blur-xl border border-zinc-800/80 rounded-2xl p-6 flex flex-col justify-between shadow-xl">
         <div>
-          <h3 class="text-sm font-bold text-white flex items-center gap-2 mb-3">
+          <h3 class="text-sm font-bold text-white flex items-center gap-2 mb-3 font-mono">
             <svg class="w-4 h-4 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
@@ -353,7 +355,7 @@ Select a pattern and synthesize to view Nemotron's memory hierarchy analysis.
           </ul>
         </div>
         <div class="mt-4 pt-4 border-t border-zinc-800">
-          <a href="https://tokenfactory.nebius.com" target="_blank" class="w-full py-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 border border-zinc-700/80 text-xs font-bold text-white flex items-center justify-center gap-2 transition active:scale-95 shadow-sm">
+          <a href="https://tokenfactory.nebius.com" target="_blank" class="w-full py-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 border border-zinc-700/80 text-xs font-bold text-white flex items-center justify-center gap-2 transition active:scale-95 shadow-sm font-mono">
             <span>Nebius Token Factory Portal</span>
             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
@@ -368,6 +370,19 @@ Select a pattern and synthesize to view Nemotron's memory hierarchy analysis.
 
   <!-- Modern Sleek Toast Notification Container -->
   <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- Corporate Footer -->
+  <footer class="relative z-10 border-t border-zinc-800/80 py-8 text-center text-xs text-zinc-500 font-mono">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-2">
+        <img src="/static/assets/logo-aetheria.svg" alt="Aetheria Systems" class="w-4 h-4 opacity-50">
+        <span>&copy; 2026 AETHERIA SYSTEMS, INC. &bull; Engineered by Jordi Albarracín</span>
+      </div>
+      <div class="text-zinc-400">
+        NVIDIA Hopper H100 Tensor Cores &bull; OpenAI Triton &bull; Nebius Token Factory
+      </div>
+    </div>
+  </footer>
 
   <script>
     let chartInstance = null;
@@ -386,7 +401,6 @@ Select a pattern and synthesize to view Nemotron's memory hierarchy analysis.
       }, 2500);
     }
 
-    // Chart init with modern dark styling
     function initChart(pyLatency, trLatency, pyVram, trVram) {
       const ctx = document.getElementById('benchmarkChart').getContext('2d');
       if (chartInstance) chartInstance.destroy();
@@ -428,7 +442,6 @@ Select a pattern and synthesize to view Nemotron's memory hierarchy analysis.
       });
     }
 
-    // Load Initial Pattern
     async function loadPattern(id) {
       try {
         const res = await fetch(`/api/pattern/${id}`);
@@ -440,7 +453,6 @@ Select a pattern and synthesize to view Nemotron's memory hierarchy analysis.
       }
     }
 
-    // Run Optimization
     async function runOptimize() {
       const patternId = document.getElementById('patternSelect').value;
       const targetGpu = document.getElementById('gpuSelect').value;
@@ -496,7 +508,6 @@ Select a pattern and synthesize to view Nemotron's memory hierarchy analysis.
       }
     }
 
-    // Event listeners
     document.getElementById('patternSelect').addEventListener('change', (e) => {
       loadPattern(e.target.value);
     });
@@ -519,7 +530,6 @@ Select a pattern and synthesize to view Nemotron's memory hierarchy analysis.
       showToast("Triton kernel copiado al portapapeles");
     });
 
-    // Startup
     window.addEventListener('DOMContentLoaded', () => {
       loadPattern('fused_attention');
       initChart(4.85, 1.42, 168.0, 37.0);
