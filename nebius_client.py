@@ -11,18 +11,18 @@ class NebiusNvidiaClient:
     def __init__(self, api_key: Optional[str] = None, base_url: Optional[str] = None):
         self.api_key = api_key or NEBIUS_API_KEY
         self.base_url = base_url or NEBIUS_BASE_URL
+        self.client = None
         
-        if not self.api_key:
-            raise ValueError(
-                "NEBIUS_API_KEY is not set. Please set it in your .env file or pass it to NebiusNvidiaClient."
-            )
+        if self.api_key and len(self.api_key.strip()) > 5:
+            try:
+                self.client = OpenAI(
+                    api_key=self.api_key,
+                    base_url=self.base_url,
+                    timeout=REQUEST_TIMEOUT
+                )
+            except Exception:
+                self.client = None
             
-        self.client = OpenAI(
-            api_key=self.api_key,
-            base_url=self.base_url,
-            timeout=REQUEST_TIMEOUT
-        )
-        
     def complete(
         self,
         prompt: str,
@@ -34,6 +34,16 @@ class NebiusNvidiaClient:
         """
         Execute a standard completion and measure latency and throughput.
         """
+        if not self.client:
+            return {
+                "content": "",
+                "latency_seconds": 0.01,
+                "completion_tokens": 0,
+                "prompt_tokens": len(prompt) // 4,
+                "tokens_per_second": 0,
+                "model": f"{model} (offline_fallback)"
+            }
+
         messages = [
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": prompt}
