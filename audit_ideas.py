@@ -23,31 +23,31 @@ Your evaluation must be rigorous, deeply technical, practical, and brutally hone
 Respond in clear, articulate Spanish as requested by the lead builder."""
 
     prompt = """
-Actúa como juez técnico principal de NVIDIA en el Nebius x NVIDIA Global AI Hackathon.
+Act  a como juez t  cnico principal de NVIDIA en el Nebius x NVIDIA Global AI Hackathon.
 
-1. AUDITORÍA EXHAUSTIVA DE 'OMNIKERNEL' (Puntaje del 1 al 10):
-Concepto: Un agente autónomo de ingeniería de compilación y rendimiento GPU.
+1. AUDITOR  A EXHAUSTIVA DE 'OMNIKERNEL' (Puntaje del 1 al 10):
+Concepto: Un agente aut  nomo de ingenier  a de compilaci  n y rendimiento GPU.
 Flujo:
-- El usuario introduce código PyTorch estándar (ej. atención dispersa, capas fusionadas, operadores MoE, cuantización personalizada).
-- El agente (impulsado por Nemotron) analiza la coalescencia de memoria, jerarquía de caché SRAM/HBM y paralelismo de bloques.
-- Sintetiza automáticamente un kernel en OpenAI Triton optimizado para GPUs NVIDIA (Tensor Cores / H100).
-- Ejecuta una suite de verificación matemática (equivalencia numérica con tolerancia FP16/BF16/FP8 y comprobación de race conditions).
+- El usuario introduce c  digo PyTorch est  ndar (ej. atenci  n dispersa, capas fusionadas, operadores MoE, cuantizaci  n personalizada).
+- El agente (impulsado por Nemotron) analiza la coalescencia de memoria, jerarqu  a de cach   SRAM/HBM y paralelismo de bloques.
+- Sintetiza autom  ticamente un kernel en OpenAI Triton optimizado para GPUs NVIDIA (Tensor Cores / H100).
+- Ejecuta una suite de verificaci  n matem  tica (equivalencia num  rica con tolerancia FP16/BF16/FP8 y comprobaci  n de race conditions).
 - Produce un benchmark interactivo comparativo (Speedup 2x-5x, TFLOPS alcanzados y ahorro de VRAM).
 
 Por favor audita esta idea:
-- ¿Cuál es su nota del 1 al 10 y por qué?
-- ¿Cuáles son sus mayores fortalezas ante los jueces de NVIDIA y Nebius?
-- ¿Cuáles son los riesgos técnicos reales y cómo debemos mitigarlos para que el prototipo funcione impecable este fin de semana?
-- ¿Cómo diseñar la demo perfecta para que los jueces queden alucinados en 2 minutos?
+-   Cu  l es su nota del 1 al 10 y por qu  ?
+-   Cu  les son sus mayores fortalezas ante los jueces de NVIDIA y Nebius?
+-   Cu  les son los riesgos t  cnicos reales y c  mo debemos mitigarlos para que el prototipo funcione impecable este fin de semana?
+-   C  mo dise  ar la demo perfecta para que los jueces queden alucinados en 2 minutos?
 
 2. TUS 3 RECOMENDACIONES DE IDEAS GANADORAS PARA EL HACKATHON:
 Proponnos 3 ideas de nivel mundial para competir por el 1.er puesto ($20,000), con:
 - Nombre y Track.
-- Arquitectura técnica y por qué aprovecha NVIDIA Nemotron y Nebius.
-- Auditoría / Puntuación (1 al 10) y argumento de por qué ganaría frente al resto de participantes.
+- Arquitectura t  cnica y por qu   aprovecha NVIDIA Nemotron y Nebius.
+- Audit / Puntuaci  n (1 al 10) y argumento de por qu   ganar  a frente al resto de participantes.
 """
 
-    print("Enviando petición a nvidia/Nemotron-3_5-Lightning...")
+    print("Enviando petici  n a nvidia/Nemotron-3_5-Lightning...")
     res = client.complete(
         prompt=prompt,
         system_prompt=system_prompt,

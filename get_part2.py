@@ -18,7 +18,7 @@ Para cada una de las 3 ideas, detalla:
 1. Nombre y Track oficial (Coding & Agentic Engineering, Best Apps & Agents, Personal AI).
 2. Tesis del problema real y solución técnica.
 3. Arquitectura exacta: cómo utiliza NVIDIA Nemotron y la infraestructura de Nebius Token Factory.
-4. Tu auditoría como juez: Puntuación del 1 al 10 y el por qué ganaría frente a los cientos de proyectos mediocres del hackathon.
+4. Tu audit como juez: Puntuación del 1 al 10 y el por qué ganaría frente a los cientos de proyectos mediocres del hackathon.
 5. El factor "efecto WOW" para la demo del jurado.
 """
 
