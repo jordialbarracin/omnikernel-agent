@@ -3,101 +3,151 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OmniKernel | Autonomous GPU Triton Architect</title>
-  <!-- Tailwind CSS -->
+  <title>OmniKernel • Autonomous GPU Triton Compiler &amp; Architect</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- FontAwesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script>
     tailwind.config = {
       darkMode: 'class',
       theme: {
         extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+            mono: ['Geist Mono', 'monospace'],
+          },
           colors: {
-            nvidia: '#76B900',
-            nvidiaHover: '#88D600',
-            darkBg: '#0B0F17',
-            cardBg: '#131B2E',
-            borderGlow: '#1E293B'
+            brand: {
+              zinc: '#09090b',
+              surface: '#121215',
+              border: '#27272a',
+              nvidia: '#76B900',
+              nvidiaHover: '#88D600',
+              nebius: '#00D1FF',
+            }
           }
         }
       }
     }
   </script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
-    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #080C14; color: #F1F5F9; }
-    code, pre { font-family: 'JetBrains Mono', monospace; }
-    .glow-green { box-shadow: 0 0 25px rgba(118, 185, 0, 0.25); }
-    .glow-card { border: 1px solid rgba(118, 185, 0, 0.2); }
-    .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
-    .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+    body { background-color: #09090b; color: #fafafa; }
+    .bg-grid-pattern {
+      background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+      background-size: 24px 24px;
+      mask-image: radial-gradient(ellipse at 50% 0%, #000 70%, transparent 100%);
+      -webkit-mask-image: radial-gradient(ellipse at 50% 0%, #000 70%, transparent 100%);
+    }
+    .border-beam-nvidia {
+      position: relative;
+    }
+    .border-beam-nvidia::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: inherit;
+      padding: 1px;
+      background: linear-gradient(90deg, rgba(118,185,0,0.6), rgba(0,209,255,0.4), rgba(118,185,0,0.6));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #09090b; }
+    ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #3f3f46; }
   </style>
 </head>
-<body class="min-h-screen custom-scrollbar">
+<body class="min-h-screen antialiased flex flex-col font-sans relative selection:bg-emerald-500/20 selection:text-emerald-200">
 
-  <!-- Navbar -->
-  <header class="border-b border-gray-800 bg-[#0B0F19]/90 backdrop-blur sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-      <div class="flex items-center space-x-3">
-        <div class="w-10 h-10 rounded-lg bg-nvidia/10 border border-nvidia flex items-center justify-center text-nvidia font-black text-xl shadow-lg shadow-nvidia/20">
-          <i class="fa-solid fa-microchip"></i>
+  <div class="fixed inset-0 bg-grid-pattern pointer-events-none z-0"></div>
+
+  <!-- Top Sticky Navigation (shadcn/ui style) -->
+  <header class="border-b border-zinc-800/80 bg-zinc-950/70 backdrop-blur-xl sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="relative flex items-center justify-center w-9 h-9 rounded-xl bg-zinc-900 border border-zinc-800 shadow-inner group">
+          <div class="absolute -inset-0.5 bg-gradient-to-r from-emerald-500 to-cyan-400 rounded-xl blur opacity-35 group-hover:opacity-75 transition duration-500"></div>
+          <svg class="relative w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+          </svg>
         </div>
         <div>
-          <span class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
-            Omni<span class="text-nvidia">Kernel</span>
-            <span class="text-xs px-2 py-0.5 rounded-full bg-nvidia/20 text-nvidia border border-nvidia/30 font-mono">v1.0-h100</span>
-          </span>
-          <p class="text-[11px] text-gray-400">Autonomous GPU Compiler Engine &middot; Nebius x NVIDIA Hackathon</p>
+          <div class="flex items-center gap-2">
+            <span class="font-extrabold text-sm sm:text-base tracking-tight text-zinc-100">
+              Omni<span class="text-emerald-400">Kernel</span>
+            </span>
+            <span class="inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[10px] font-mono font-medium ring-1 ring-inset ring-emerald-500/30 bg-emerald-500/10 text-emerald-400">
+              <span class="relative flex h-1.5 w-1.5">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+              </span>
+              v1.0-Hopper-H100
+            </span>
+          </div>
+          <p class="text-[11px] text-zinc-400 hidden sm:block">
+            Autonomous GPU Compiler Engine &bull; Nebius x NVIDIA Hackathon &bull; Port 8000
+          </p>
         </div>
       </div>
 
-      <div class="flex items-center space-x-4">
-        <div class="flex items-center space-x-2 bg-gray-900/80 px-3 py-1.5 rounded-lg border border-gray-800 text-xs text-gray-300">
-          <span class="w-2 h-2 rounded-full bg-nvidia animate-pulse"></span>
-          <span>Engine: <b class="text-white">Nemotron-3_5-Lightning</b></span>
-          <span class="text-gray-600">|</span>
-          <span>Cloud: <b class="text-nvidia">Nebius Token Factory</b></span>
+      <div class="flex items-center gap-3">
+        <div class="hidden md:flex items-center gap-2 bg-zinc-900/80 px-3 py-1.5 rounded-xl border border-zinc-800 text-xs text-zinc-300 font-mono">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span>Engine: <b class="text-white">Nemotron-3.5</b></span>
+          <span class="text-zinc-600">&bull;</span>
+          <span>Cloud: <b class="text-cyan-400">Nebius Token Factory</b></span>
         </div>
-        <a href="https://github.com" target="_blank" class="text-gray-400 hover:text-white transition">
-          <i class="fa-brands fa-github text-xl"></i>
+        <a href="http://127.0.0.1:8080" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-200 transition flex items-center gap-1.5 shadow-sm active:scale-95">
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 17l-5-5m0 0l5-5m-5 5h12" />
+          </svg>
+          <span>Mission Control</span>
         </a>
       </div>
     </div>
   </header>
 
   <!-- Hero & Controls -->
-  <main class="max-w-7xl mx-auto px-6 py-8">
+  <main class="relative z-10 flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
       <!-- Left Column: Settings & Configuration -->
-      <div class="bg-[#111827] border border-gray-800 rounded-2xl p-6 flex flex-col justify-between shadow-xl">
+      <div class="bg-zinc-900/40 backdrop-blur-xl border border-zinc-800/80 rounded-2xl p-6 flex flex-col justify-between shadow-xl">
         <div>
-          <h2 class="text-lg font-bold text-white flex items-center gap-2 mb-4">
-            <i class="fa-solid fa-sliders text-nvidia"></i>
-            Kernel Synthesis Specs
-          </h2>
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-base font-bold text-white flex items-center gap-2">
+              <svg class="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+              </svg>
+              <span>Kernel Synthesis Specs</span>
+            </h2>
+            <span class="inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-mono font-medium ring-1 ring-inset ring-emerald-500/30 bg-emerald-500/10 text-emerald-400">
+              OpenAI Triton
+            </span>
+          </div>
 
           <!-- Canonical Pattern Select -->
           <div class="mb-5">
-            <label class="block text-xs font-semibold text-gray-400 mb-2 uppercase tracking-wider">Canonical Bottleneck Pattern</label>
-            <select id="patternSelect" class="w-full bg-gray-950 border border-gray-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-nvidia transition">
+            <label class="block text-xs font-semibold text-zinc-400 mb-2 uppercase tracking-wider font-mono">Bottleneck Pattern</label>
+            <select id="patternSelect" class="w-full bg-zinc-950 border border-zinc-700/80 rounded-xl px-3.5 py-2.5 text-xs text-zinc-100 focus:outline-none focus:border-emerald-500 font-mono transition">
               <option value="fused_attention">1. Fused Attention (FlashAttention-style)</option>
               <option value="fused_mlp_norm">2. Fused LayerNorm + GELU + GEMM</option>
               <option value="fp8_quantized_gemm">3. FP8 Quantized MatMul (On-The-Fly)</option>
               <option value="moe_routing_scatter">4. Top-K MoE Routing Dispatcher</option>
             </select>
-            <p id="patternDesc" class="text-xs text-gray-400 mt-2 leading-relaxed">
+            <p id="patternDesc" class="text-xs text-zinc-400 mt-2 leading-relaxed">
               Fuses Q @ K^T, online Softmax scaling, and @ V without writing the O(N^2) attention matrix to HBM.
             </p>
           </div>
 
           <!-- Target GPU -->
           <div class="mb-5">
-            <label class="block text-xs font-semibold text-gray-400 mb-2 uppercase tracking-wider">Target GPU Microarchitecture</label>
-            <select id="gpuSelect" class="w-full bg-gray-950 border border-gray-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-nvidia transition">
+            <label class="block text-xs font-semibold text-zinc-400 mb-2 uppercase tracking-wider font-mono">Target Microarchitecture</label>
+            <select id="gpuSelect" class="w-full bg-zinc-950 border border-zinc-700/80 rounded-xl px-3.5 py-2.5 text-xs text-zinc-100 focus:outline-none focus:border-emerald-500 font-mono transition">
               <option value="NVIDIA Hopper H100 (Tensor Cores / 80GB HBM3)">NVIDIA Hopper H100 (80GB HBM3)</option>
               <option value="NVIDIA Ada Lovelace RTX 4090">NVIDIA Ada Lovelace (RTX 4090 / L40S)</option>
               <option value="NVIDIA Ampere A100 (40GB/80GB SXM4)">NVIDIA Ampere A100 (SXM4)</option>
@@ -107,23 +157,27 @@
 
           <!-- Numeric Precision -->
           <div class="mb-5">
-            <label class="block text-xs font-semibold text-gray-400 mb-2 uppercase tracking-wider">Precision & Accumulation</label>
+            <label class="block text-xs font-semibold text-zinc-400 mb-2 uppercase tracking-wider font-mono">Precision &amp; Accumulation</label>
             <div class="grid grid-cols-3 gap-2">
-              <button type="button" class="precision-btn px-3 py-2 rounded-lg text-xs font-bold border border-nvidia bg-nvidia/20 text-nvidia" data-val="FP16">FP16 / FP32</button>
-              <button type="button" class="precision-btn px-3 py-2 rounded-lg text-xs font-bold border border-gray-800 bg-gray-900 text-gray-400 hover:border-gray-700" data-val="BF16">BF16</button>
-              <button type="button" class="precision-btn px-3 py-2 rounded-lg text-xs font-bold border border-gray-800 bg-gray-900 text-gray-400 hover:border-gray-700" data-val="FP8">FP8 E4M3</button>
+              <button type="button" class="precision-btn px-3 py-2 rounded-xl text-xs font-mono font-bold ring-1 ring-inset ring-emerald-500/40 bg-emerald-500/10 text-emerald-400 transition" data-val="FP16">FP16 / FP32</button>
+              <button type="button" class="precision-btn px-3 py-2 rounded-xl text-xs font-mono font-bold ring-1 ring-inset ring-zinc-700/50 bg-zinc-950/80 text-zinc-400 hover:text-zinc-200 transition" data-val="BF16">BF16</button>
+              <button type="button" class="precision-btn px-3 py-2 rounded-xl text-xs font-mono font-bold ring-1 ring-inset ring-zinc-700/50 bg-zinc-950/80 text-zinc-400 hover:text-zinc-200 transition" data-val="FP8">FP8 E4M3</button>
             </div>
           </div>
         </div>
 
         <!-- Action Button -->
-        <div>
-          <button id="optimizeBtn" class="w-full py-4 rounded-xl bg-nvidia hover:bg-nvidiaHover text-gray-950 font-black text-sm uppercase tracking-wider flex items-center justify-center gap-2 transition duration-200 shadow-lg shadow-nvidia/30 glow-green">
-            <i class="fa-solid fa-bolt"></i>
+        <div class="mt-4">
+          <button id="optimizeBtn" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-400 hover:from-emerald-400 hover:to-emerald-300 text-zinc-950 font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition duration-200 shadow-lg shadow-emerald-500/25 active:scale-95">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
             <span>Synthesize &amp; Benchmark</span>
           </button>
-          <div id="loaderStatus" class="hidden mt-3 text-center text-xs text-nvidia font-mono flex items-center justify-center gap-2">
-            <i class="fa-solid fa-circle-notch fa-spin"></i>
+          <div id="loaderStatus" class="hidden mt-3 text-center text-xs text-emerald-400 font-mono flex items-center justify-center gap-2">
+            <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
             <span id="loaderMsg">Invoking NVIDIA Nemotron on Nebius...</span>
           </div>
         </div>
@@ -133,60 +187,68 @@
       <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4">
         
         <!-- Speedup Card -->
-        <div class="bg-[#111827] border border-gray-800 rounded-2xl p-5 flex flex-col justify-between">
-          <div class="flex items-center justify-between text-gray-400 text-xs font-semibold uppercase">
+        <div class="bg-zinc-900/40 backdrop-blur-xl border border-zinc-800/80 rounded-2xl p-5 flex flex-col justify-between shadow-xl">
+          <div class="flex items-center justify-between text-zinc-400 text-xs font-semibold uppercase font-mono">
             <span>Measured Speedup</span>
-            <i class="fa-solid fa-gauge-high text-nvidia text-sm"></i>
+            <svg class="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+            </svg>
           </div>
           <div class="my-3">
-            <span id="speedupDisplay" class="text-4xl font-extrabold text-white tracking-tight">3.42x</span>
-            <span class="text-xs text-nvidia ml-2 font-bold">+242% Faster</span>
+            <span id="speedupDisplay" class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">3.42x</span>
+            <span class="inline-flex items-center rounded-md px-1.5 py-0.5 text-xs font-mono font-medium ring-1 ring-inset ring-emerald-500/30 bg-emerald-500/10 text-emerald-400 ml-2">+242% Faster</span>
           </div>
-          <div class="text-[11px] text-gray-400">
-            Latency drops from <span id="baselineLatency" class="text-red-400">4.85ms</span> &rarr; <span id="kernelLatency" class="text-nvidia font-bold">1.42ms</span>
+          <div class="text-[11px] text-zinc-400 font-mono">
+            Latency: <span id="baselineLatency" class="text-rose-400">4.85ms</span> &rarr; <span id="kernelLatency" class="text-emerald-400 font-bold">1.42ms</span>
           </div>
         </div>
 
         <!-- VRAM Card -->
-        <div class="bg-[#111827] border border-gray-800 rounded-2xl p-5 flex flex-col justify-between">
-          <div class="flex items-center justify-between text-gray-400 text-xs font-semibold uppercase">
+        <div class="bg-zinc-900/40 backdrop-blur-xl border border-zinc-800/80 rounded-2xl p-5 flex flex-col justify-between shadow-xl">
+          <div class="flex items-center justify-between text-zinc-400 text-xs font-semibold uppercase font-mono">
             <span>VRAM Allocation</span>
-            <i class="fa-solid fa-memory text-cyan-400 text-sm"></i>
+            <svg class="w-4 h-4 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+            </svg>
           </div>
           <div class="my-3">
-            <span id="vramSavingDisplay" class="text-4xl font-extrabold text-white tracking-tight">-78.0%</span>
-            <span class="text-xs text-cyan-400 ml-2 font-bold">Saved</span>
+            <span id="vramSavingDisplay" class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">-78.0%</span>
+            <span class="inline-flex items-center rounded-md px-1.5 py-0.5 text-xs font-mono font-medium ring-1 ring-inset ring-cyan-500/30 bg-cyan-500/10 text-cyan-400 ml-2">Saved</span>
           </div>
-          <div class="text-[11px] text-gray-400">
-            Peak buffer: <span id="baselineVram" class="text-red-400">168 MB</span> &rarr; <span id="kernelVram" class="text-cyan-400 font-bold">37 MB</span>
+          <div class="text-[11px] text-zinc-400 font-mono">
+            Peak buffer: <span id="baselineVram" class="text-rose-400">168 MB</span> &rarr; <span id="kernelVram" class="text-cyan-400 font-bold">37 MB</span>
           </div>
         </div>
 
         <!-- Verification Badge Card -->
-        <div class="bg-[#111827] border border-green-900/40 rounded-2xl p-5 flex flex-col justify-between">
-          <div class="flex items-center justify-between text-gray-400 text-xs font-semibold uppercase">
-            <span>Mathematical Equivalence</span>
-            <i class="fa-solid fa-shield-halved text-emerald-400 text-sm"></i>
+        <div class="bg-zinc-900/40 backdrop-blur-xl border border-zinc-800/80 rounded-2xl p-5 flex flex-col justify-between shadow-xl">
+          <div class="flex items-center justify-between text-zinc-400 text-xs font-semibold uppercase font-mono">
+            <span>Equivalence</span>
+            <svg class="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
           </div>
           <div class="my-3">
-            <div id="verifBadge" class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-bold text-xs">
-              <i class="fa-solid fa-check"></i>
+            <div id="verifBadge" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-bold text-xs font-mono">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
               <span>torch.allclose PASSED</span>
             </div>
           </div>
-          <div class="text-[11px] text-gray-400">
+          <div class="text-[11px] text-zinc-400 font-mono">
             Max Diff: <span id="maxDiff" class="text-emerald-300 font-mono">0.000488</span> &lt; 0.001
           </div>
         </div>
 
-        <!-- Chart Container (spans full width of right col) -->
-        <div class="md:col-span-3 bg-[#111827] border border-gray-800 rounded-2xl p-6">
+        <!-- Chart Container -->
+        <div class="md:col-span-3 bg-zinc-900/40 backdrop-blur-xl border border-zinc-800/80 rounded-2xl p-6 shadow-xl">
           <div class="flex items-center justify-between mb-4">
-            <h3 class="text-sm font-bold text-white flex items-center gap-2">
-              <i class="fa-solid fa-chart-column text-nvidia"></i>
-              Live Profiling: PyTorch Baseline vs OmniKernel Triton
+            <h3 class="text-xs sm:text-sm font-bold text-white flex items-center gap-2">
+              <svg class="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+              <span>Live Profiling: PyTorch Baseline vs OmniKernel Triton</span>
             </h3>
-            <span class="text-xs text-gray-400">Target: Hopper H100 Tensor Cores</span>
+            <span class="text-xs text-zinc-400 font-mono">Target: Hopper H100 Tensor Cores</span>
           </div>
           <div class="h-44">
             <canvas id="benchmarkChart"></canvas>
@@ -197,83 +259,105 @@
     </div>
 
     <!-- Code Comparison Section -->
-    <div class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
       <!-- PyTorch Baseline Code -->
-      <div class="bg-[#0E1422] border border-gray-800 rounded-2xl overflow-hidden shadow-xl">
-        <div class="bg-gray-900/80 px-5 py-3 border-b border-gray-800 flex items-center justify-between">
-          <span class="text-xs font-bold text-gray-300 flex items-center gap-2">
-            <i class="fa-brands fa-python text-yellow-500"></i>
-            Original PyTorch Baseline (Unfused / Memory Bound)
+      <div class="bg-zinc-900/40 backdrop-blur-xl border border-zinc-800/80 rounded-2xl overflow-hidden shadow-xl">
+        <div class="bg-zinc-950/80 px-5 py-3 border-b border-zinc-800/80 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <div class="flex items-center gap-1.5 mr-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-rose-500/80"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-amber-500/80"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500/80"></span>
+            </div>
+            <span class="text-xs font-bold text-zinc-300 font-mono">
+              PyTorch Baseline (Unfused / Memory Bound)
+            </span>
+          </div>
+          <span class="inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-mono font-medium ring-1 ring-inset ring-rose-500/30 bg-rose-500/10 text-rose-400">
+            Slow HBM Reads
           </span>
-          <span class="text-[11px] px-2 py-0.5 rounded bg-red-500/10 border border-red-500/30 text-red-400 font-mono">Slow HBM Reads</span>
         </div>
         <div class="p-4">
-          <pre class="text-xs text-gray-300 font-mono overflow-x-auto max-h-[420px] custom-scrollbar"><code id="pytorchCode">// Loading code...</code></pre>
+          <pre class="text-xs text-zinc-300 font-mono overflow-x-auto max-h-[420px] leading-relaxed"><code id="pytorchCode">// Loading code...</code></pre>
         </div>
       </div>
 
       <!-- Synthesized Triton Kernel -->
-      <div class="bg-[#0E1422] border border-nvidia/30 rounded-2xl overflow-hidden shadow-xl glow-card">
-        <div class="bg-gray-900/80 px-5 py-3 border-b border-gray-800 flex items-center justify-between">
-          <span class="text-xs font-bold text-nvidia flex items-center gap-2">
-            <i class="fa-solid fa-bolt text-nvidia"></i>
-            OmniKernel Synthesized OpenAI Triton Kernel
-          </span>
+      <div class="border-beam-nvidia bg-zinc-900/40 backdrop-blur-xl border border-zinc-800/80 rounded-2xl overflow-hidden shadow-xl">
+        <div class="bg-zinc-950/80 px-5 py-3 border-b border-zinc-800/80 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <div class="flex items-center gap-1.5 mr-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-rose-500/80"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-amber-500/80"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500/80"></span>
+            </div>
+            <span class="text-xs font-bold text-emerald-400 font-mono">
+              OmniKernel Synthesized OpenAI Triton Kernel
+            </span>
+          </div>
           <div class="flex items-center space-x-2">
-            <button id="copyBtn" class="text-xs px-2.5 py-1 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 transition flex items-center gap-1">
-              <i class="fa-regular fa-copy"></i> Copy
+            <button id="copyBtn" class="text-xs px-2.5 py-1 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 transition font-mono flex items-center gap-1 shadow-sm active:scale-95">
+              <span>Copiar Kernel</span>
             </button>
-            <span class="text-[11px] px-2 py-0.5 rounded bg-nvidia/20 border border-nvidia/30 text-nvidia font-mono font-bold">Tensor Cores</span>
+            <span class="inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-mono font-medium ring-1 ring-inset ring-emerald-500/30 bg-emerald-500/10 text-emerald-400">
+              Tensor Cores
+            </span>
           </div>
         </div>
         <div class="p-4">
-          <pre class="text-xs text-emerald-300 font-mono overflow-x-auto max-h-[420px] custom-scrollbar"><code id="tritonCode">// Click "Synthesize &amp; Benchmark" to compile...</code></pre>
+          <pre class="text-xs text-emerald-300 font-mono overflow-x-auto max-h-[420px] leading-relaxed"><code id="tritonCode">// Click "Synthesize &amp; Benchmark" to compile...</code></pre>
         </div>
       </div>
 
     </div>
 
     <!-- Architectural Deep Dive & Nebius Cloud Impact -->
-    <div class="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
       
       <!-- Architectural Deep Dive -->
-      <div class="lg:col-span-2 bg-[#111827] border border-gray-800 rounded-2xl p-6">
+      <div class="lg:col-span-2 bg-zinc-900/40 backdrop-blur-xl border border-zinc-800/80 rounded-2xl p-6 shadow-xl">
         <h3 class="text-sm font-bold text-white flex items-center gap-2 mb-3">
-          <i class="fa-solid fa-microchip text-nvidia"></i>
-          NVIDIA Nemotron Compiler Analysis &amp; Microarchitecture Details
+          <svg class="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+          </svg>
+          <span>NVIDIA Nemotron Compiler Analysis &amp; Microarchitecture</span>
         </h3>
-        <div id="compilerAnalysis" class="text-xs text-gray-300 leading-relaxed font-mono whitespace-pre-wrap bg-gray-950 p-4 rounded-xl border border-gray-800 max-h-[220px] overflow-y-auto custom-scrollbar">
+        <div id="compilerAnalysis" class="text-xs text-zinc-300 leading-relaxed font-mono whitespace-pre-wrap bg-zinc-950/80 p-4 rounded-xl border border-zinc-800 max-h-[220px] overflow-y-auto">
 Select a pattern and synthesize to view Nemotron's memory hierarchy analysis.
         </div>
       </div>
 
       <!-- Nebius Economic Impact -->
-      <div class="bg-[#111827] border border-gray-800 rounded-2xl p-6 flex flex-col justify-between">
+      <div class="bg-zinc-900/40 backdrop-blur-xl border border-zinc-800/80 rounded-2xl p-6 flex flex-col justify-between shadow-xl">
         <div>
           <h3 class="text-sm font-bold text-white flex items-center gap-2 mb-3">
-            <i class="fa-solid fa-coins text-yellow-400"></i>
-            Nebius GPU Economic Impact
+            <svg class="w-4 h-4 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>Nebius GPU Economic Impact</span>
           </h3>
-          <ul class="text-xs space-y-3 text-gray-300">
+          <ul class="text-xs space-y-3 text-zinc-300 font-sans">
             <li class="flex items-start gap-2">
-              <i class="fa-solid fa-circle-check text-nvidia mt-0.5"></i>
+              <span class="text-emerald-400 font-bold mt-0.5">✔</span>
               <span><b>68% compute time saved</b> per 10M tokens processed.</span>
             </li>
             <li class="flex items-start gap-2">
-              <i class="fa-solid fa-circle-check text-nvidia mt-0.5"></i>
+              <span class="text-emerald-400 font-bold mt-0.5">✔</span>
               <span><b>$14.40 / hr</b> direct savings on an 8x H100 cluster.</span>
             </li>
             <li class="flex items-start gap-2">
-              <i class="fa-solid fa-circle-check text-nvidia mt-0.5"></i>
+              <span class="text-emerald-400 font-bold mt-0.5">✔</span>
               <span><b>$126,144 / year</b> projected infrastructure cost reduction.</span>
             </li>
           </ul>
         </div>
-        <div class="mt-4 pt-4 border-t border-gray-800">
-          <a href="https://tokenfactory.nebius.com" target="_blank" class="w-full py-2.5 rounded-lg bg-gray-900 hover:bg-gray-800 border border-gray-700 text-xs font-bold text-white flex items-center justify-center gap-2 transition">
+        <div class="mt-4 pt-4 border-t border-zinc-800">
+          <a href="https://tokenfactory.nebius.com" target="_blank" class="w-full py-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 border border-zinc-700/80 text-xs font-bold text-white flex items-center justify-center gap-2 transition active:scale-95 shadow-sm">
             <span>Nebius Token Factory Portal</span>
-            <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+            </svg>
           </a>
         </div>
       </div>
@@ -282,11 +366,27 @@ Select a pattern and synthesize to view Nemotron's memory hierarchy analysis.
 
   </main>
 
+  <!-- Modern Sleek Toast Notification Container -->
+  <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
   <script>
     let chartInstance = null;
     let selectedPrecision = "FP16";
 
-    // Chart init
+    function showToast(message) {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = 'pointer-events-auto flex items-center gap-2 px-4 py-2.5 rounded-xl border border-zinc-800 bg-zinc-950/90 backdrop-blur-xl text-xs font-mono text-zinc-200 shadow-2xl transition-all duration-300 transform translate-y-2 opacity-0';
+      toast.innerHTML = `<span class="text-emerald-400">✔</span> <span>${message}</span>`;
+      container.appendChild(toast);
+      requestAnimationFrame(() => toast.classList.remove('translate-y-2', 'opacity-0'));
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 2500);
+    }
+
+    // Chart init with modern dark styling
     function initChart(pyLatency, trLatency, pyVram, trVram) {
       const ctx = document.getElementById('benchmarkChart').getContext('2d');
       if (chartInstance) chartInstance.destroy();
@@ -294,15 +394,15 @@ Select a pattern and synthesize to view Nemotron's memory hierarchy analysis.
       chartInstance = new Chart(ctx, {
         type: 'bar',
         data: {
-          labels: ['Latency (ms - Lower is better)', 'Peak VRAM (MB - Lower is better)'],
+          labels: ['Latency (ms - Menor es mejor)', 'Peak VRAM (MB - Menor es mejor)'],
           datasets: [
             {
-              label: 'Standard PyTorch Baseline',
+              label: 'PyTorch Baseline',
               data: [pyLatency, pyVram],
               backgroundColor: 'rgba(239, 68, 68, 0.75)',
               borderColor: 'rgb(239, 68, 68)',
               borderWidth: 1,
-              borderRadius: 6
+              borderRadius: 8
             },
             {
               label: 'OmniKernel (OpenAI Triton)',
@@ -310,7 +410,7 @@ Select a pattern and synthesize to view Nemotron's memory hierarchy analysis.
               backgroundColor: 'rgba(118, 185, 0, 0.85)',
               borderColor: 'rgb(118, 185, 0)',
               borderWidth: 1,
-              borderRadius: 6
+              borderRadius: 8
             }
           ]
         },
@@ -318,11 +418,11 @@ Select a pattern and synthesize to view Nemotron's memory hierarchy analysis.
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
-            legend: { labels: { color: '#94A3B8', font: { size: 11, family: 'Plus Jakarta Sans' } } }
+            legend: { labels: { color: '#a1a1aa', font: { size: 11, family: 'Plus Jakarta Sans' } } }
           },
           scales: {
-            x: { ticks: { color: '#94A3B8' }, grid: { color: '#1E293B' } },
-            y: { ticks: { color: '#94A3B8' }, grid: { color: '#1E293B' } }
+            x: { ticks: { color: '#a1a1aa' }, grid: { color: '#27272a' } },
+            y: { ticks: { color: '#a1a1aa' }, grid: { color: '#27272a' } }
           }
         }
       });
@@ -363,7 +463,6 @@ Select a pattern and synthesize to view Nemotron's memory hierarchy analysis.
         });
         const data = await res.json();
 
-        // Update displays
         const prof = data.profiling;
         const synth = data.synthesis;
         const verif = data.verification;
@@ -386,6 +485,7 @@ Select a pattern and synthesize to view Nemotron's memory hierarchy analysis.
           prof.pytorch_baseline.vram_mb,
           prof.omnikernel_triton.vram_mb
         );
+        showToast("Kernel sintetizado y verificado");
 
       } catch (err) {
         alert("Optimization request failed: " + err);
@@ -404,9 +504,9 @@ Select a pattern and synthesize to view Nemotron's memory hierarchy analysis.
     document.querySelectorAll('.precision-btn').forEach(b => {
       b.addEventListener('click', () => {
         document.querySelectorAll('.precision-btn').forEach(btn => {
-          btn.className = "precision-btn px-3 py-2 rounded-lg text-xs font-bold border border-gray-800 bg-gray-900 text-gray-400 hover:border-gray-700";
+          btn.className = "precision-btn px-3 py-2 rounded-xl text-xs font-mono font-bold ring-1 ring-inset ring-zinc-700/50 bg-zinc-950/80 text-zinc-400 hover:text-zinc-200 transition";
         });
-        b.className = "precision-btn px-3 py-2 rounded-lg text-xs font-bold border border-nvidia bg-nvidia/20 text-nvidia";
+        b.className = "precision-btn px-3 py-2 rounded-xl text-xs font-mono font-bold ring-1 ring-inset ring-emerald-500/40 bg-emerald-500/10 text-emerald-400 transition";
         selectedPrecision = b.dataset.val;
       });
     });
@@ -416,14 +516,14 @@ Select a pattern and synthesize to view Nemotron's memory hierarchy analysis.
     document.getElementById('copyBtn').addEventListener('click', () => {
       const code = document.getElementById('tritonCode').innerText;
       navigator.clipboard.writeText(code);
-      alert('Triton kernel code copied to clipboard!');
+      showToast("Triton kernel copiado al portapapeles");
     });
 
     // Startup
     window.addEventListener('DOMContentLoaded', () => {
       loadPattern('fused_attention');
       initChart(4.85, 1.42, 168.0, 37.0);
-      runOptimize(); // Run initial optimization on load
+      runOptimize();
     });
   </script>
 </body>
