@@ -54,14 +54,19 @@ def _fused_attention_fwd_kernel(
     
     # Loop over KV blocks in SRAM cache without writing to HBM
     for start_n in range(0, (start_m + 1) * BLOCK_M, BLOCK_N):
-        k = tl.load(K + off_k + start_n * stride_kn, mask=(start_n + offs_n)[None, :] < N_CTX, other=0.0)
+        mask_k = (start_n + offs_n)[None, :] < N_CTX
+        k = tl.load(K + off_k + start_n * stride_kn, mask=mask_k, other=0.0)
         # Tensor Core MMA: Q @ K.T
         qk = tl.zeros([BLOCK_M, BLOCK_N], dtype=tl.float32)
         qk += tl.dot(q, k) * sm_scale
+
+        # Boundary condition: replace out-of-bounds columns with -inf so dynamic sequence lengths (seq_len % BLOCK_N != 0) do not corrupt max reduction
+        qk = tl.where(mask_k, qk, float("-inf"))
         
-        # Online softmax update
+        # Numerical stability: safe online softmax with clamp against FP16 exponent underflow/overflow
         m_ij = tl.maximum(m_i, tl.max(qk, 1))
-        p = tl.exp(qk - m_ij[:, None])
+        p = tl.exp(tl.clamp(qk - m_ij[:, None], -65.0, 0.0))
+        p = tl.where(mask_k, p, 0.0)
         l_ij = tl.sum(p, 1)
         
         # Rescale accumulator
@@ -69,8 +74,9 @@ def _fused_attention_fwd_kernel(
         l_i = l_i * alpha + l_ij
         acc = acc * alpha[:, None]
         
-        # Load V block and accumulate
-        v = tl.load(V + off_v + start_n * stride_vn, mask=(start_n + offs_n)[:, None] < N_CTX, other=0.0)
+        # Load V block and accumulate with boundary mask
+        mask_v = (start_n + offs_n)[:, None] < N_CTX
+        v = tl.load(V + off_v + start_n * stride_vn, mask=mask_v, other=0.0)
         p = p.to(tl.float16)
         acc += tl.dot(p, v)
         m_i = m_ij
