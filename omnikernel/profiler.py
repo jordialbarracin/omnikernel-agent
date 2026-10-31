@@ -1,4 +1,4 @@
-"""
+﻿"""
 OmniKernel GPU Profiler & Benchmark Engine:
 Calculates arithmetic intensity, speedup, TFLOPS, memory bandwidth,
 and Nebius GPU cloud cost savings.
@@ -47,8 +47,8 @@ class KernelProfiler:
             "ridge_point_flops_per_byte": ridge_point,
             "pytorch_arithmetic_intensity": ai_pytorch,
             "triton_arithmetic_intensity": ai_triton,
-            "pytorch_regime": "MEMORY_BANDWIDTH_BOUND (HBM Latency Limited)",
-            "triton_regime": "COMPUTE_BOUND_ROOFLINE (Near Tensor Core Peak)",
+            "pytorch_regime": "MEMORY_BANDWIDTH_BOUND (analytical model estimate, not measured)",
+            "triton_regime": "MEMORY_BOUND, higher intensity (analytical model estimate, not measured)",
             "arithmetic_intensity_boost": f"{round(ai_triton / ai_pytorch, 1)}x higher FLOPs/Byte"
         }
 
